@@ -1,0 +1,51 @@
+/* Full component */
+.createPostContainer{
+    /*background: #F44336;*/
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+/* Text area */
+.contentArea{
+    /*background: #2196F3;*/
+    margin: 0px;
+    padding: 0px;
+}
+
+.contentArea > .MuiFormControl-root{
+    /*background: #795548;*/
+    width: 100%;
+    padding: 0px 10px 0px 10px;
+}
+
+.contentArea .MuiOutlinedInput-multiline, .contentArea label {
+    padding-left: 15px;
+    font-size: 1.15em;
+}
+
+/*Bottom buttons */
+.bottomButtons{
+    /*background: #8BC34A;*/
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+
+.bottomButtons > .MuiFormControl-root, .bottomButtons > .MuiButtonBase-root {
+    margin-right: 10px;
+}
+
+.bottomButtons .MuiInputBase-root, .bottomButtons > .MuiButtonBase-root{
+    height: 40px;
+}
+
+.bottomButtons .MuiInputBase-root{
+    /*background: #9C27B0;*/
+    padding-right: 10px;
+}
+
+.bottomButtons > .MuiButtonBase-root{
+    padding-left: 15px;
+    padding-right: 15px;
+}
