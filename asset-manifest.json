@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/claudineibjr/SocialNetwork/static/css/main.d2f647f7.chunk.css",
+    "main.js": "/claudineibjr/SocialNetwork/static/js/main.15c5227b.chunk.js",
+    "main.js.map": "/claudineibjr/SocialNetwork/static/js/main.15c5227b.chunk.js.map",
+    "runtime-main.js": "/claudineibjr/SocialNetwork/static/js/runtime-main.1b8a62a2.js",
+    "runtime-main.js.map": "/claudineibjr/SocialNetwork/static/js/runtime-main.1b8a62a2.js.map",
+    "static/js/2.c94141f4.chunk.js": "/claudineibjr/SocialNetwork/static/js/2.c94141f4.chunk.js",
+    "static/js/2.c94141f4.chunk.js.map": "/claudineibjr/SocialNetwork/static/js/2.c94141f4.chunk.js.map",
+    "index.html": "/claudineibjr/SocialNetwork/index.html",
+    "precache-manifest.ee0d552e16aa5ff56ccebf6c5ecb11e5.js": "/claudineibjr/SocialNetwork/precache-manifest.ee0d552e16aa5ff56ccebf6c5ecb11e5.js",
+    "service-worker.js": "/claudineibjr/SocialNetwork/service-worker.js",
+    "static/css/main.d2f647f7.chunk.css.map": "/claudineibjr/SocialNetwork/static/css/main.d2f647f7.chunk.css.map",
+    "static/media/logo.svg": "/claudineibjr/SocialNetwork/static/media/logo.25bf045c.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.1b8a62a2.js",
+    "static/js/2.c94141f4.chunk.js",
+    "static/css/main.d2f647f7.chunk.css",
+    "static/js/main.15c5227b.chunk.js"
+  ]
+}
