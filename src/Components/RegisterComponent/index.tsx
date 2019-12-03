@@ -2,13 +2,12 @@
 import React from 'react';
 
 // Styles
-import './styles.css'
+import '../../Pages/Login/styles.css'
 import profilePicture from '../../Resources/ProfilePicture.png';
 
 // Material-UI Components
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import Avatar from '@material-ui/core/Avatar';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
@@ -23,12 +22,9 @@ import InputLabel from '@material-ui/core/InputLabel';
 import {Utilities} from '../../Services/Utilities';
 
 // Icons
-import Icon from '@material-ui/core/Icon';
-import IconButton from '@material-ui/core/IconButton';
-import PhotoCamera from '@material-ui/icons/PhotoCamera';
 
 export default function RegisterComponent(){
-    // Enum
+    // Enums
     enum FIELD {
         EMAIL,
         FIRSTNAME,
@@ -99,12 +95,12 @@ export default function RegisterComponent(){
     }
 
     return(
-        <div className="registerContainer">
-            <div className="registerWelcome">
+        <div className="componentContainer">
+            <div className="componentWelcome">
                 Welcome to mine, yours, our Social Network!
             </div>
 
-            <form className='registerForm'>
+            <form className='componentForm'>
                     <TextField
                         required
                         error = {displayError(FIELD.EMAIL)}

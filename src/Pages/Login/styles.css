@@ -1,3 +1,4 @@
+/* Full Page */
 .login-container{
     height: 100%;
     display: flex;
@@ -5,9 +6,64 @@
     align-items: center;
 }
 
+/* Bottom */
 .bottomTabs{
     flex-grow: 1;
     position: fixed;
     bottom: 0;
+    width: 100%;
+}
+
+/* Register/Login container */
+.componentContainer{
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    height: 75%;
+    justify-content: center;
+}
+
+.componentLoginContainer{
+    width: 30%;
+}
+
+/* Header */
+.componentWelcome{
+    padding: 10px;
+    font-size: 1.25em;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Body */
+.componentForm{
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 75%;
+}
+
+.componentLoginForm {
+    height: 55%;
+}
+
+.componentForm > .MuiFormControl-root{
+    margin-top: 10px;
+    padding: 5px;
+    width: 50%;
+}
+
+.componentLoginForm > .MuiFormControl-root{
+    width: 100%;
+}
+
+/* Footer */
+.formSubmit{
+    padding: 10px;
+}
+
+.submitButton{
     width: 100%;
 }

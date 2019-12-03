@@ -22,11 +22,11 @@ import RegisterComponent from '../../Components/RegisterComponent';
 
 export default function Login(){
     enum TABS {
-        Login = 'LOGIN',
-        Register = 'REGISTER'
+        Login,
+        Register
     }
 
-    const [selectedTab, setSelectedTab] = React.useState(TABS.Register);
+    const [selectedTab, setSelectedTab] = React.useState(TABS.Login);
 
     function renderActiveTab(){
         switch (selectedTab) {
