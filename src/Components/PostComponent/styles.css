@@ -1,0 +1,28 @@
+.postContainer {
+    margin: 5px;
+}
+
+.cardContainer {
+    max-width: 345;
+}
+
+.MuiCardContent-root:last-child {
+    padding-bottom: 12px !important;
+}
+
+.cardContainer .MuiCardHeader-root {
+    padding-bottom: 4px;
+}
+
+.cardContainer .MuiIconButton-root{
+    padding: 4px;
+}
+
+.cardContainer .MuiCardContent-root{
+    padding-bottom: 0px;
+}
+
+.cardMedia {
+    height: 0;
+    padding-top: 56.25%;
+}

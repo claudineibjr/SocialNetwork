@@ -8,6 +8,7 @@ import './styles.css'
 
 // Components
 import CreatePost from '../../Components/CreatePost';
+import PostComponent from '../../Components/PostComponent';
 
 // Model
 
@@ -19,6 +20,19 @@ export default function Home(){
     return (
         <div className="homePageContainer">
             <CreatePost/>
+
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
+            <PostComponent/>
         </div>
     );
 }
