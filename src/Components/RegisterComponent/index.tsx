@@ -113,6 +113,17 @@ export default function RegisterComponent(){
 
                     <TextField 
                         required
+                        error = {displayError(FIELD.PASSWORD)}
+                        value={password}
+                        onChange = {newValue => setPassword(newValue.target.value)}
+                        id="password"
+                        label="Password"
+                        type="password"
+                        helperText = {displayHelperText(FIELD.PASSWORD)}
+                        variant="outlined"/>
+
+                    <TextField 
+                        required
                         error = {displayError(FIELD.FIRSTNAME)}
                         value={firstName}
                         onChange = {newValue => setFirstName(newValue.target.value)}
@@ -128,17 +139,6 @@ export default function RegisterComponent(){
                         error = {displayError(FIELD.LASTNAME)}
                         label="Last name"
                         helperText = {displayHelperText(FIELD.LASTNAME)}
-                        variant="outlined"/>
-                
-                    <TextField 
-                        required
-                        error = {displayError(FIELD.PASSWORD)}
-                        value={password}
-                        onChange = {newValue => setPassword(newValue.target.value)}
-                        id="password"
-                        label="Password"
-                        type="password"
-                        helperText = {displayHelperText(FIELD.PASSWORD)}
                         variant="outlined"/>
 
                     <TextField
