@@ -1,72 +1,41 @@
-.register-container{
-    padding: 20px;
-
-    border-radius: 7px 7px 7px 7px;
-    -moz-border-radius: 7px 7px 7px 7px;
-    -webkit-border-radius: 7px 7px 7px 7px;
-    border: 0px solid #000000;
-}
-
-.form-register{
+/* Full page */
+.registerContainer{
+    padding: 15px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    width: 40%;
+    height: 75%;
     justify-content: center;
-    width: 500px;
 }
 
-.formDivContainer{
-    flex: 1;
-    flex-grow: 1;
-}
-
-.formDivContainer > button{
-    width: 100%;
+/* Header */
+.registerWelcome{
+    padding: 10px;
+    font-size: 1.25em;
     font-weight: bold;
-    color: #000000;
-}
-
-/* Bottom button */
-.registerButton{
-    margin-top: 20px !important;
-}
-
-/* Margin-top to each field on form */
-.form-register > div > div {
-    margin-right: 10px;
-    margin-left: 10px;
-    margin-top: 15px;
-}
-
-/* Font-size to each label on form */
-.form-register > div > label {
-    font-size: 14pt;
-}
-
-/* Profile picture */
-.profilePicture{
-    width: 120px;
-    height: 120px;
-}
-
-/* Button to upload profile picture */
-.fileInput{
-    display: 'none';
-}
-
-.inputImage{
-    display: none;
-}
-
-/* Class to represent the element with */
-.inputDate{
-    width: 100%;
-}
-
-/* Select sex */
-.inputSex{
-    min-width: 120px;
-}
-
-.info{
     text-align: center;
+}
+
+/* Body */
+.registerForm{
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 75%;
+}
+
+.registerForm > .MuiFormControl-root{
+    margin-top: 10px;
+    padding: 5px;
+    width: 50%;
+}
+
+/* Footer */
+.formSubmit{
+    padding: 10px;
+}
+
+.submitButton{
+    width: 100%;
 }

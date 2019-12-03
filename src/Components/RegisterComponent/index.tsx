@@ -99,13 +99,12 @@ export default function RegisterComponent(){
     }
 
     return(
-        <div className="register-container">
-            <div className="info">
-                Welcome to mine, yours, our Social Network!!!
+        <div className="registerContainer">
+            <div className="registerWelcome">
+                Welcome to mine, yours, our Social Network!
             </div>
 
-            <form className='form-register'>
-                <div className='formDivContainer'>
+            <form className='registerForm'>
                     <TextField
                         required
                         error = {displayError(FIELD.EMAIL)}
@@ -134,9 +133,7 @@ export default function RegisterComponent(){
                         label="Last name"
                         helperText = {displayHelperText(FIELD.LASTNAME)}
                         variant="outlined"/>
-                </div>
-
-                <div className="formDivContainer">
+                
                     <TextField 
                         required
                         error = {displayError(FIELD.PASSWORD)}
@@ -159,14 +156,12 @@ export default function RegisterComponent(){
                             shrink: true,
                         }}
                         variant="outlined"
-                        fullWidth
                         />
 
                     <FormControl
-                        className='inputSex'
-                        fullWidth
+                        variant="outlined"
                         error={displayError(FIELD.SEX)}>
-                        <InputLabel id="demo-simple-select-error-label">Sexo</InputLabel>
+                        <InputLabel id="demo-simple-select-error-label">Gender</InputLabel>
                         <Select
                             labelId="demo-simple-select-error-label"
                             id="demo-simple-select-error"
@@ -183,14 +178,13 @@ export default function RegisterComponent(){
                         <FormHelperText>{displayHelperText(FIELD.SEX)}</FormHelperText>
                     </FormControl>
 
-                </div>
             </form>
 
-            <div className = 'formDivContainer'>
+            <div className = 'formSubmit'>
                 <Button
                     variant="contained"
                     color="primary"
-                    className='registerButton'
+                    className='submitButton'
                     onClick = {handleRegister}>
                     Register
                 </Button>

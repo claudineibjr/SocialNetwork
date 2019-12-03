@@ -18,8 +18,7 @@ import RegisterComponent from '../../Components/RegisterComponent';
 // Services
 
 // Icons
-import PhoneIcon from '@material-ui/icons/Phone';
-import FavoriteIcon from '@material-ui/icons/Favorite';
+
 
 export default function Login(){
     enum TABS {

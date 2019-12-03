@@ -6,4 +6,4 @@ import Login from './Pages/Login';
 
 import './Styles/general.css';
 
-ReactDOM.render(<Login />, document.getElementById('root'));
+ReactDOM.render(<Login/>, document.getElementById('root'));
