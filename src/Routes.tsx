@@ -8,6 +8,7 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import Login from './Pages/Login';
 import Home from './Pages/Home';
 import Profile from './Pages/Profile';
+import NotFound from './Pages/NotFound';
 
 export enum PossibleRoutes{
     LOGIN = '/login',
@@ -23,6 +24,7 @@ export default function Routes(){
                 <Route path={PossibleRoutes.LOGIN} component={Login}/>
                 <Route path={PossibleRoutes.HOME} component={Home}/>
                 <Route path={PossibleRoutes.PROFILE} component={Profile}/>
+                <Route path='*' component={NotFound}/>
             </BrowserRouter>
         </Provider>
     )
