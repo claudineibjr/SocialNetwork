@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 // Redux
 import { connect } from 'react-redux';
 import * as Actions from '../../Store/actions';
-import { IStore } from '../../Store/index';
+import store, { IStore } from '../../Store/index';
 
 // Styles
 import '../../Pages/Login/styles.css'
@@ -41,6 +41,7 @@ enum FIELD {
 
 // Interfaces
 interface IProps {
+    dispatch: any,
     userAuthenticated?: User
 }
 
@@ -55,6 +56,8 @@ interface IState {
 }
 
 class RegisterComponent extends Component<IProps, IState>{
+    errorMessages: Map<number, string> = new Map<number, string>();
+
     constructor(props: IProps){
         super(props);
 
@@ -67,6 +70,10 @@ class RegisterComponent extends Component<IProps, IState>{
             sex: Gender.NOT_INFORM,
             birthday: undefined
         }
+
+        // Initializing map
+        for (let field in FIELD)
+            this.errorMessages.set(parseInt(field), '');
     }
 
     // Functions and consts
@@ -74,47 +81,61 @@ class RegisterComponent extends Component<IProps, IState>{
         return this.displayHelperText(field).length > 0;
     }
 
+    setHelpersText = (): void => {
+        const {email, password, firstName} = this.state;
+
+        let message: string = '';
+
+        // Email
+        message = '';
+        if (!Utilities.validateEmail(email))
+            message =  'Email address is not valid';
+        this.errorMessages.set(FIELD.EMAIL, message);
+
+        // FirstName
+        message = '';
+        if (firstName.length === 0)
+            message =  'First Name Required';;
+        this.errorMessages.set(FIELD.FIRSTNAME, message);
+        
+        // Password
+        message = '';
+        if (password.length === 0)
+            message =  'Password is required';
+        this.errorMessages.set(FIELD.PASSWORD, message);
+    }
+
     displayHelperText = (field: FIELD): string => {
-        const {submitted, email, password, firstName, sex} = this.state;
-    
-        if (!submitted)
+        if (this.state.submitted)
+            return this.errorMessages.get(field) as string;
+        else
             return '';
-
-        switch (field){
-            case FIELD.EMAIL:
-                if (!Utilities.validateEmail(email))
-                    return 'Email address is not valid';
-                else
-                    return '';
-
-            case FIELD.FIRSTNAME:
-                if (firstName.length === 0)
-                    return 'First Name Required';
-                else
-                    return ''
-
-            case FIELD.PASSWORD:
-                if (password.length === 0)
-                    return 'Password is required';
-                else
-                    return '';
-
-            default:
-                return '';
-        }
     }
     
     handleRegister = async () => {
-        await this.setState({submitted: true});
+        this.setState({submitted: true});
+
+        let error: boolean = false;
+        this.errorMessages.forEach((value: string, key: number) => {
+            if (!error)
+                error = value.length > 0;
+        });
+
+        if (!error){
+            const {email, firstName, lastName, sex, birthday} = this.state;
+            const user: User = new User(email, firstName, sex, birthday, lastName);
+
+            if ( (store.getState() as IStore).userAuthenticated == undefined )
+                this.props.dispatch(Actions.login(user));
+            else
+                this.props.dispatch(Actions.logoff());
+        }
     }
 
     render(){
-        //console.log('Register Component - this.props.userAuthenticated');
-        //console.log(this.props.userAuthenticated);
-        //console.log();
-
         const {email, password, firstName, lastName, sex, birthday} = this.state;
 
+        this.setHelpersText();
         return(
             <div className="componentContainer">
                 <div className="componentWelcome">

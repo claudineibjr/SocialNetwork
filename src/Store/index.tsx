@@ -16,7 +16,24 @@ const INITIAL_STATE: IStore = {
 }
 
 function reducer(state: any = INITIAL_STATE, action: IAction){
-    if (action.type === ACTIONS.SET_AUTHENTICATED){
+    switch(action.type){
+        case (ACTIONS.LOGIN):{
+            return {
+                ...state,
+                userAuthenticated: action.userAuthenticated
+            }}
+        case (ACTIONS.LOGOFF):{
+            return{
+                ...state,
+                userAuthenticated: undefined
+            }
+        }
+
+        default:
+            return state;
+    }
+    
+    if (action.type === ACTIONS.LOGIN){
         return {
             ...state,
             userAuthenticated: action.userAuthenticated

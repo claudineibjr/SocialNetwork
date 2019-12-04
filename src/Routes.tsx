@@ -9,7 +9,7 @@ import Login from './Pages/Login';
 import Home from './Pages/Home';
 import Profile from './Pages/Profile';
 
-export enum enumROUTES{
+export enum PossibleRoutes{
     LOGIN = '/login',
     HOME = '/home',
     PROFILE = '/profile'
@@ -20,9 +20,9 @@ export default function Routes(){
         <Provider store={store} >
             <BrowserRouter>
                 <Route path='/' exact component={Login}/>
-                <Route path='/login' component={Login}/>
-                <Route path='/home' component={Home}/>
-                <Route path='/profile' component={Profile}/>
+                <Route path={PossibleRoutes.LOGIN} component={Login}/>
+                <Route path={PossibleRoutes.HOME} component={Home}/>
+                <Route path={PossibleRoutes.PROFILE} component={Profile}/>
             </BrowserRouter>
         </Provider>
     )

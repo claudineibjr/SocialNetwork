@@ -1,7 +1,14 @@
 // React Imports
 import React, { Component } from 'react';
 
+// Router
+import { Link } from 'react-router-dom'
+import {PossibleRoutes} from '../../Routes';
+
 // Redux
+import { connect } from 'react-redux';
+import * as Actions from '../../Store/actions';
+import store, { IStore } from '../../Store/index';
 
 // Styles
 import './styles.css'
@@ -31,7 +38,8 @@ enum TABS {
 // Interfaces
 interface IProps {
     userAuthenticated?: User,
-    dispatch: any
+    dispatch: any,
+    history: any
 }
 
 interface IState {
@@ -39,9 +47,20 @@ interface IState {
 }
 
 class Login extends Component<IProps, IState>{
-    state = {
-        selectedTab: TABS.Login
-    };
+    constructor(props: IProps){
+        super(props);
+
+        this.state = {
+            selectedTab: TABS.Login
+        };
+
+        store.subscribe(this.authenticationCanBeChanged);
+    }
+
+    authenticationCanBeChanged = () => {
+        if ((store.getState() as IStore).userAuthenticated !== undefined)
+            this.props.history.push(PossibleRoutes.HOME);
+    }
 
     setSelectedTab(newValue: TABS){
         this.setState({selectedTab: newValue});
