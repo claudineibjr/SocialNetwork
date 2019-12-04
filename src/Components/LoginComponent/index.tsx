@@ -17,14 +17,20 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 // Components
+import CustomSnackBar, {VARIANT} from '../CustomSnackBar';
 
 // Model
+import User, { Gender } from '../../Model/User';
 
 // Services
 import {Utilities} from '../../Services/Utilities';
-import User, { Gender } from '../../Model/User';
+import {FirebaseAuth} from '../../Services/Firebase/FirebaseAuth';
+import {UserDB} from '../../Services/Firebase/Database/UserDB';
 
 // Icons
 
@@ -48,7 +54,9 @@ interface IProps {
 interface IState {
     submitted: boolean,
     email: string,
-    password: string
+    password: string,
+    showSnackBar: boolean,
+    snackBarText: string
 }
 
 class LoginComponent extends Component<IProps, IState>{
@@ -60,7 +68,9 @@ class LoginComponent extends Component<IProps, IState>{
         this.state = {
             submitted: false,
             email: '',
-            password: ''
+            password: '',
+            showSnackBar: false,
+            snackBarText: ''
         };
 
         // Initializing map
@@ -108,18 +118,22 @@ class LoginComponent extends Component<IProps, IState>{
         });
 
         if (!error){
-            const email = this.state.email;
-            const user: User = new User(email, '', Gender.NOT_INFORM);
-
-            if ( (store.getState() as IStore).userAuthenticated == undefined )
-                this.props.dispatch(Actions.login(user));
-            else
-                this.props.dispatch(Actions.logoff());
+            const {email, password} = this.state;
+            FirebaseAuth.loginUser(email, password).then((info) => {
+                UserDB.getUser(info.user!.uid).then((user) => {
+                    this.props.dispatch(Actions.login(user));
+                });
+            }).catch(async (error) => {
+                await this.setState({snackBarText: error.message})
+                this.setState({showSnackBar: true});
+            });
         }
     }
     
-    render(){
-        const {email, password} = this.state;
+    handleClose = () => this.setState({showSnackBar: false});
+
+    render(){   
+        const {email, password, showSnackBar, snackBarText} = this.state;
         
         this.setHelpersText();
         return(
@@ -127,6 +141,12 @@ class LoginComponent extends Component<IProps, IState>{
                 <div className="componentWelcome">
                     Good to see you again. Welcome!
                 </div>
+
+                <CustomSnackBar
+                    variant = {VARIANT.ERROR}
+                    handleClose={this.handleClose}
+                    show={showSnackBar}
+                    text={snackBarText}/>
 
                 <form className="componentForm componentLoginForm">
                     <TextField

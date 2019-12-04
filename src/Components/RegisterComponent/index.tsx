@@ -20,12 +20,15 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 
 // Components
+import CustomSnackBar, {VARIANT} from '../CustomSnackBar';
 
 // Model
 import User, {Gender} from '../../Model/User';
 
 // Services
 import {Utilities} from '../../Services/Utilities';
+import {FirebaseAuth} from '../../Services/Firebase/FirebaseAuth';
+import {UserDB} from '../../Services/Firebase/Database/UserDB';
 
 // Icons
 
@@ -52,7 +55,9 @@ interface IState {
     lastName: string,
     password: string,
     sex: Gender,
-    birthday?: Date
+    birthday?: Date,
+    showSnackBar: boolean,
+    snackBarText: string
 }
 
 class RegisterComponent extends Component<IProps, IState>{
@@ -68,7 +73,9 @@ class RegisterComponent extends Component<IProps, IState>{
             lastName: '',
             password: '',
             sex: Gender.NOT_INFORM,
-            birthday: undefined
+            birthday: undefined,
+            showSnackBar: false,
+            snackBarText: ''
         }
 
         // Initializing map
@@ -122,18 +129,24 @@ class RegisterComponent extends Component<IProps, IState>{
         });
 
         if (!error){
-            const {email, firstName, lastName, sex, birthday} = this.state;
-            const user: User = new User(email, firstName, sex, birthday, lastName);
+            const {email, password, firstName, lastName, sex, birthday} = this.state;
+            let user: User = new User(email, firstName, sex, birthday, lastName);
 
-            if ( (store.getState() as IStore).userAuthenticated == undefined )
+            FirebaseAuth.createUser(email, password).then(async (info) => {
+                user.id = info.user!.uid;
+                await UserDB.createUser(user);
                 this.props.dispatch(Actions.login(user));
-            else
-                this.props.dispatch(Actions.logoff());
+            }).catch( async (error) => {
+                await this.setState({snackBarText: error.message})
+                this.setState({showSnackBar: true});
+            });
         }
     }
 
+    handleClose = () => this.setState({showSnackBar: false});
+
     render(){
-        const {email, password, firstName, lastName, sex, birthday} = this.state;
+        const {email, password, firstName, lastName, sex, birthday, showSnackBar, snackBarText} = this.state;
 
         this.setHelpersText();
         return(
@@ -142,6 +155,12 @@ class RegisterComponent extends Component<IProps, IState>{
                     Welcome to mine, yours, our Social Network!
                 </div>
     
+                <CustomSnackBar
+                    variant = {VARIANT.ERROR}
+                    handleClose={this.handleClose}
+                    show={showSnackBar}
+                    text={snackBarText}/>
+
                 <form className='componentForm'>
                         <TextField
                             required

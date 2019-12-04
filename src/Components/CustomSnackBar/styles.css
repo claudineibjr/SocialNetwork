@@ -1,0 +1,31 @@
+.message{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12pt;
+}
+
+.message > .MuiSvgIcon-root{
+    margin-right: 5px;
+}
+
+.SnackBar, .MuiSnackbarContent-root {
+    border: 1px !important;
+    border-radius: 4px !important;
+}
+
+.warning .MuiSnackbarContent-root {
+    background: #FFB300 !important;
+}
+
+.success .MuiSnackbarContent-root {
+    background: #43A047 !important;
+}
+
+.error .MuiSnackbarContent-root {
+    background-color: #E53935 !important;
+}
+
+.info .MuiSnackbarContent-root {
+    background: #1E88E5 !important;
+}
