@@ -37,9 +37,10 @@ import {Utilities} from '../../Services/Utilities';
 // Icons
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import Post from '../../Model/Post';
 
 interface Props {
-    
+    post: Post
 }
 
 interface State {
@@ -57,19 +58,19 @@ export default class PostComponent extends Component<Props, State>{
                 <Card className='cardContainer'>
                     <CardHeader
                         avatar = {<Avatar aria-label="recipe"> C </Avatar>}
-                        title="Claudinei Brito Junior"
-                        subheader="Ontem, às 16h05"/>
+                        title={this.props.post.user.getFullName()}
+                        subheader={Utilities.formatDate(this.props.post.date, true)}/>
                     
                     <CardContent>
-                        Lorem ipsum dolor sit amexsat, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu saçldad fugiat nulla pariatur.
+                        {this.props.post.content}
                     </CardContent>
 
                     <CardActions disableSpacing>
-                        <IconButton aria-label="add to favorites">
+                        <IconButton aria-label="edit">
                             <EditIcon />
                         </IconButton>
                         
-                        <IconButton aria-label="share">
+                        <IconButton aria-label="delete">
                             <DeleteForeverIcon />
                         </IconButton>
                     </CardActions>

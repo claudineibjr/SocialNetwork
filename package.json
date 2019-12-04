@@ -42,6 +42,8 @@
   },
   "homepage": "https://claudineibjr.github.io/SocialNetwork/",
   "devDependencies": {
-    "gh-pages": "^2.1.1"
+    "gh-pages": "^2.1.1",
+    "react-redux": "^7.1.3",
+    "redux": "^4.0.4"
   }
 }

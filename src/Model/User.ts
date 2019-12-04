@@ -25,4 +25,8 @@ export default class User{
         this.friends = new Array<User>();
         this._friends = new Array<string>();
     }
+
+    getFullName(): string{
+        return this.firstName + ' ' + this.lastName;
+    }
 }
