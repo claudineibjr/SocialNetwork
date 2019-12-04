@@ -34,11 +34,7 @@ export default class Home extends Component<Props, State>{
         const user: User = new User('claudineibjr@hotmail.com', 'Claudinei', Gender.MALE, new Date(1996, 9, 27), 'Brito Junior')
         this.state = {
             user: user,
-            posts: [
-                new Post(user, new Date(), 'Hello World', PostVisibility.PUBLIC),
-                new Post(user, new Date(), 'Hoje estou estudando React', PostVisibility.PUBLIC),
-                new Post(user, new Date(), 'Isso aqui ninguém deveria ficar sabendo', PostVisibility.PRIVATE),
-            ]
+            posts: []
         }
     }
 

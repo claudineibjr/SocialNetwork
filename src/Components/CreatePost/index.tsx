@@ -1,5 +1,8 @@
 // React Imports
-import React from 'react';
+import React, {Component} from 'react';
+
+// Redux
+import store, { IStore } from '../../Store/index';
 
 // Styles
 import './styles.css'
@@ -14,96 +17,154 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 
 // Components
+import CustomSnackBar, {VARIANT} from '../CustomSnackBar';
 
 // Model
+import Post from '../../Model/Post';
+import User from '../../Model/User';
 
 // Services
 import {Utilities} from '../../Services/Utilities';
+import {PostDB} from '../../Services/Firebase/Database/PostDB';
+import { PostVisibility } from '../../Model/Post';
 
 // Icons
 
-export default function CreatePost(){
-    // Enums
-    enum VISIBILITY {
-        FRIENDS = 'Friends',
-        PUBLIC = 'Public'
-    }
+interface IProps {
 
-    enum FIELD {
-        POST_CONTENT
-    }
+}
 
-    // State
-    const [submitted, setSubmitted] = React.useState(false);
-    const [visibility, setVisibility] = React.useState(VISIBILITY.FRIENDS);
-    const [postContent, setPostContent] = React.useState('');
+interface IState {
+    submitted: boolean,
+    visibility: PostVisibility,
+    postContent: string,
+    showSnackBar: boolean
+}
+
+enum FIELD {
+    POST_CONTENT
+}
+
+class CreatePost extends Component<IProps, IState>{
+    errorMessages: Map<number, string> = new Map<number, string>();
+    
+    constructor(props: IProps){
+        super(props);
+
+        this.state = {
+            submitted: false,
+            visibility: PostVisibility.PRIVATE,
+            postContent: '',
+            showSnackBar: false
+        }
+
+        // Initializing map
+        for (let field in FIELD)
+            this.errorMessages.set(parseInt(field), '');
+    }
 
     // Functions and consts
-    const displayError = (field: FIELD): boolean => {
-        return displayHelperText(field).length > 0;
+    displayError = (field: FIELD): boolean => {
+        return this.displayHelperText(field).length > 0;
     }
 
-    const displayHelperText = (field: FIELD): string => {
-        if (!submitted)
+    setHelpersText = (): void => {
+        const {postContent} = this.state;
+
+        let message: string = '';
+
+        // Email
+        message = '';
+        if (postContent.length === 0)
+            message =  'Post content required';
+        this.errorMessages.set(FIELD.POST_CONTENT, message);
+    }
+
+    displayHelperText = (field: FIELD): string => {
+        if (this.state.submitted)
+            return this.errorMessages.get(field) as string;
+        else
             return '';
+    }
 
-        switch (field){
-            case FIELD.POST_CONTENT:
-                if (postContent.length === 0)
-                    return 'Post content required';
-                else
-                    return '';
+    handlePost = async () => {
+        this.setState({submitted: true});
 
-            default:
-                return '';
+        let error: boolean = false;
+        this.errorMessages.forEach((value: string, key: number) => {
+            if (!error)
+                error = value.length > 0;
+        });
+
+        if (!error){
+            const {postContent, visibility} = this.state;
+            const user: User = (store.getState() as IStore).userAuthenticated!;
+            
+            const post: Post = new Post(user, new Date(), postContent, visibility);
+            PostDB.createPost(post).then((idPost) => {
+                this.setState({submitted: false, showSnackBar: true, postContent: ''});
+            });
         }
     }
 
-    async function handlePost(){
-        setSubmitted(true);
+    setPostContent = (newValue: string) => this.setState({postContent: newValue});
+    setVisibility = (newValue: PostVisibility) => this.setState({visibility: newValue});
+    handleCloseSnackBar = () => this.setState({showSnackBar: false})
+    
+    render(){
+        const {visibility, postContent, showSnackBar} = this.state;
+
+        this.setHelpersText();
+        return(
+            <div className="createPostContainer">
+    
+                <CustomSnackBar
+                    variant = {VARIANT.SUCCESS}
+                    handleClose={this.handleCloseSnackBar}
+                    show={showSnackBar}
+                    text='Post created'/>
+
+                <div className="contentArea">
+                    <TextField
+                        id="outlined-multiline-static"
+                        label="What's going on?"
+                        multiline
+                        rows="4"
+                        value={postContent}
+                        onChange = {newValue => this.setPostContent(newValue.target.value)}
+                        margin="normal"
+                        variant="outlined"
+                        error = {this.displayError(FIELD.POST_CONTENT)}
+                        helperText = {this.displayHelperText(FIELD.POST_CONTENT)}
+                        />
+                </div>
+    
+                <div className="bottomButtons">
+                    <FormControl 
+                        variant="outlined"
+                        className = 'formChooseVisibility'>
+                        <Select
+                            labelId="demo-simple-select-error-label"
+                            id="demo-simple-select-error"
+                            value={visibility}
+                            onChange={newValue => this.setVisibility(newValue.target.value as PostVisibility)}
+                            >
+                            <MenuItem value={PostVisibility.PRIVATE}>Only friends</MenuItem>
+                            <MenuItem value={PostVisibility.PUBLIC}>Public</MenuItem>
+                        </Select>
+                    </FormControl>
+    
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick = {this.handlePost}
+                        className = 'formSubmit'>
+                        Post
+                    </Button>
+                </div>
+            </div>
+        );
     }
-
-    return(
-        <div className="createPostContainer">
-
-            <div className="contentArea">
-                <TextField
-                    id="outlined-multiline-static"
-                    label="What's going on?"
-                    multiline
-                    rows="4"
-                    value={postContent}
-                    onChange = {newValue => setPostContent(newValue.target.value)}
-                    margin="normal"
-                    variant="outlined"
-                    error = {displayError(FIELD.POST_CONTENT)}
-                    helperText = {displayHelperText(FIELD.POST_CONTENT)}
-                    />
-            </div>
-
-            <div className="bottomButtons">
-                <FormControl 
-                    variant="outlined"
-                    className = 'formChooseVisibility'>
-                    <Select
-                        labelId="demo-simple-select-error-label"
-                        id="demo-simple-select-error"
-                        value={visibility}
-                        onChange={newValue => setVisibility(newValue.target.value as VISIBILITY)}
-                        >
-                        <MenuItem value={VISIBILITY.FRIENDS}>{VISIBILITY.FRIENDS}</MenuItem>
-                        <MenuItem value={VISIBILITY.PUBLIC}>{VISIBILITY.PUBLIC}</MenuItem>
-                    </Select>
-                </FormControl>
-
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick = {handlePost}
-                    className = 'formSubmit'>
-                    Post
-                </Button>
-            </div>
-        </div>
-    );
 }
+
+export default CreatePost;

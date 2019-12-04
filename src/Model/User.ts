@@ -11,9 +11,10 @@ export default class User{
     lastName: string;
     gender: Gender;
     birthday?: Date;
-    friends: Array<User>;
+    friends: Array<User>; // Not persisted on database
+    //posts
 
-    _friends: Array<string>;
+    _friends: Array<string>; // Users ID - Persisted on database
 
     constructor(email: string, firstName: string, gender: Gender, birthday?: Date,  lastName: string = ''){
         this.email = email;
@@ -43,18 +44,22 @@ export default class User{
         }
     }
 
-    static getUser(_user: any): User {
+    static getUser(_user: any, loadFriends: boolean = false): User {
         let id: string = _user.id;
         let email: string = _user.email;
         let firstName: string = _user.firstName;
         let lastName: string = _user.lastName;
         let gender: Gender = _user.gender;
         let birthday: Date | undefined = _user.birthday ? new Date(_user.birthday) : undefined;
-        let friends: Array<string> = _user.friends ? Object.keys(_user.requests).map(iCount => _user.friends[iCount]) : new Array<string>();
+        let _friends: Array<string> = _user.friends ? Object.keys(_user.requests).map(iCount => _user.friends[iCount]) : new Array<string>();
+        let friends: Array<User> = new Array<User>();
+        if (loadFriends)
+            friends = new Array<User>();
 
         let user: User = new User(email, firstName, gender, birthday, lastName);
         user.id = id;
-        user._friends = friends;
+        user._friends = _friends;
+        user.friends = friends;
 
         return user;
     }

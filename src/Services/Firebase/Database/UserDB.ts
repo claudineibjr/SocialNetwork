@@ -1,7 +1,6 @@
 import {firebaseApp, initializeFirebase} from '../Firebase';
 
 import User from '../../../Model/User';
-import { resolve } from 'dns';
 
 export class UserDB {
     static async createUser(user: User): Promise<void> {
