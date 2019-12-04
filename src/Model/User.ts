@@ -10,15 +10,16 @@ export default class User{
     firstName: string;
     lastName: string;
     gender: Gender;
-    birthday: Date;
+    birthday?: Date;
     friends: Array<User>;
 
     _friends: Array<string>;
 
-    constructor(email: string, firstName: string, gender: Gender, birthday: Date,  lastName: string = ''){
+    constructor(email: string, firstName: string, gender: Gender, birthday?: Date,  lastName: string = ''){
         this.email = email;
         this.firstName = firstName;
         this.gender = gender;
+        
         this.birthday = birthday;
         this.lastName = lastName;
         

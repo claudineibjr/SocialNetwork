@@ -91,12 +91,13 @@ class LoginComponent extends Component<IProps, IState>{
     }    
     
     handleRegister = async () => {
-        this.setState({submitted: true});
+        await this.setState({submitted: true});
     }
     
     render(){
         //console.log('Login Component - this.props.userAuthenticated');
         //console.log(this.props.userAuthenticated);
+        //console.log();
 
         const {email, password} = this.state;
         return(

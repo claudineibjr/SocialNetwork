@@ -1,5 +1,10 @@
 // React Imports
-import React from 'react';
+import React, {Component} from 'react';
+
+// Redux
+import { connect } from 'react-redux';
+import * as Actions from '../../Store/actions';
+import { IStore } from '../../Store/index';
 
 // Styles
 import '../../Pages/Login/styles.css'
@@ -17,46 +22,61 @@ import InputLabel from '@material-ui/core/InputLabel';
 // Components
 
 // Model
+import User, {Gender} from '../../Model/User';
 
 // Services
 import {Utilities} from '../../Services/Utilities';
 
 // Icons
 
-export default function RegisterComponent(){
-    // Enums
-    enum FIELD {
-        EMAIL,
-        FIRSTNAME,
-        LASTNAME,
-        PASSWORD,
-        SEX,
-        BIRHTDAY
+// Enums
+enum FIELD {
+    EMAIL,
+    FIRSTNAME,
+    LASTNAME,
+    PASSWORD,
+    SEX,
+    BIRHTDAY
+}
+
+// Interfaces
+interface IProps {
+    userAuthenticated?: User
+}
+
+interface IState {
+    submitted: boolean,
+    email: string,
+    firstName: string,
+    lastName: string,
+    password: string,
+    sex: Gender,
+    birthday?: Date
+}
+
+class RegisterComponent extends Component<IProps, IState>{
+    constructor(props: IProps){
+        super(props);
+
+        this.state = {
+            submitted: false,
+            email: '',
+            firstName: '',
+            lastName: '',
+            password: '',
+            sex: Gender.NOT_INFORM,
+            birthday: undefined
+        }
     }
-    
-    enum SEX{
-        NONE = '',
-        MALE = 'Male',
-        FEMALE = 'Female',
-        NOT_INFORM = 'I prefer not to inform'
-    }
-    
-    // State
-    const [submitted, setSubmitted] = React.useState(false);
-    
-    const [email, setEmail] = React.useState('');
-    const [firstName, setFirstName] = React.useState('');
-    const [lastName, setLastName] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [sex, setSex] = React.useState('');
-    const [birthday, setBirthday] = React.useState<Date | null>(new Date());
 
     // Functions and consts
-    const displayError = (field: FIELD): boolean => {
-        return displayHelperText(field).length > 0;
+    displayError = (field: FIELD): boolean => {
+        return this.displayHelperText(field).length > 0;
     }
 
-    const displayHelperText = (field: FIELD): string => {
+    displayHelperText = (field: FIELD): string => {
+        const {submitted, email, password, firstName, sex} = this.state;
+    
         if (!submitted)
             return '';
 
@@ -79,112 +99,120 @@ export default function RegisterComponent(){
                 else
                     return '';
 
-            case FIELD.SEX:
-                if (sex === SEX.NONE)
-                    return 'Sex is required';
-                else
-                    return '';
-
             default:
                 return '';
         }
     }
     
-    async function handleRegister () {
-        setSubmitted(true);
+    handleRegister = async () => {
+        await this.setState({submitted: true});
     }
 
-    return(
-        <div className="componentContainer">
-            <div className="componentWelcome">
-                Welcome to mine, yours, our Social Network!
+    render(){
+        //console.log('Register Component - this.props.userAuthenticated');
+        //console.log(this.props.userAuthenticated);
+        //console.log();
+
+        const {email, password, firstName, lastName, sex, birthday} = this.state;
+
+        return(
+            <div className="componentContainer">
+                <div className="componentWelcome">
+                    Welcome to mine, yours, our Social Network!
+                </div>
+    
+                <form className='componentForm'>
+                        <TextField
+                            required
+                            error = {this.displayError(FIELD.EMAIL)}
+                            value={email}
+                            onChange = {newValue => this.setState({email: newValue.target.value}) }
+                            id="email"
+                            label="E-mail"
+                            helperText = {this.displayHelperText(FIELD.EMAIL)}
+                            variant="outlined"/>
+    
+                        <TextField 
+                            required
+                            error = {this.displayError(FIELD.PASSWORD)}
+                            value={password}
+                            onChange = {newValue => this.setState({password: newValue.target.value}) }
+                            id="password"
+                            label="Password"
+                            type="password"
+                            helperText = {this.displayHelperText(FIELD.PASSWORD)}
+                            variant="outlined"/>
+    
+                        <TextField 
+                            required
+                            error = {this.displayError(FIELD.FIRSTNAME)}
+                            value={firstName}
+                            onChange = {newValue => this.setState({firstName: newValue.target.value}) }
+                            id="firstName"
+                            label="First name"
+                            helperText = {this.displayHelperText(FIELD.FIRSTNAME)}
+                            variant="outlined"/>
+    
+                        <TextField 
+                            id="lastName"
+                            value={lastName}
+                            onChange = {newValue => this.setState({lastName: newValue.target.value}) }
+                            error = {this.displayError(FIELD.LASTNAME)}
+                            label="Last name"
+                            helperText = {this.displayHelperText(FIELD.LASTNAME)}
+                            variant="outlined"/>
+    
+                        <TextField
+                            id="date"
+                            label="Date of birth"
+                            type="date"
+                            value={birthday}
+                            onChange = {newValue => {
+                                let newDate: Date | null;
+                                newDate = new Date(newValue.target.value);
+                                if (newDate.getFullYear() > 1000)
+                                    this.setState({birthday: newDate})
+                            }}
+                            className = 'inputDate'
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            variant="outlined"
+                            />
+    
+                        <FormControl
+                            variant="outlined"
+                            error={this.displayError(FIELD.SEX)}>
+                            <InputLabel id="demo-simple-select-error-label">Gender</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-error-label"
+                                id="demo-simple-select-error"
+                                value={sex}
+                                onChange={newValue => this.setState({sex: newValue.target.value as Gender})}
+                                >
+                                <MenuItem value={Gender.MALE}>Male</MenuItem>
+                                <MenuItem value={Gender.FEMALE}>Female</MenuItem>
+                                <MenuItem value={Gender.NOT_INFORM}>Not informed</MenuItem>
+                            </Select>
+                            <FormHelperText>{this.displayHelperText(FIELD.SEX)}</FormHelperText>
+                        </FormControl>
+    
+                </form>
+    
+                <div className = 'formSubmit'>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className='submitButton'
+                        onClick = {this.handleRegister}>
+                        Register
+                    </Button>
+                </div>
             </div>
+        );
+    }
 
-            <form className='componentForm'>
-                    <TextField
-                        required
-                        error = {displayError(FIELD.EMAIL)}
-                        value={email}
-                        onChange = {newValue => setEmail(newValue.target.value)}
-                        id="email"
-                        label="E-mail"
-                        helperText = {displayHelperText(FIELD.EMAIL)}
-                        variant="outlined"/>
-
-                    <TextField 
-                        required
-                        error = {displayError(FIELD.PASSWORD)}
-                        value={password}
-                        onChange = {newValue => setPassword(newValue.target.value)}
-                        id="password"
-                        label="Password"
-                        type="password"
-                        helperText = {displayHelperText(FIELD.PASSWORD)}
-                        variant="outlined"/>
-
-                    <TextField 
-                        required
-                        error = {displayError(FIELD.FIRSTNAME)}
-                        value={firstName}
-                        onChange = {newValue => setFirstName(newValue.target.value)}
-                        id="firstName"
-                        label="First name"
-                        helperText = {displayHelperText(FIELD.FIRSTNAME)}
-                        variant="outlined"/>
-
-                    <TextField 
-                        id="lastName"
-                        value={lastName}
-                        onChange = {newValue => setLastName(newValue.target.value)}
-                        error = {displayError(FIELD.LASTNAME)}
-                        label="Last name"
-                        helperText = {displayHelperText(FIELD.LASTNAME)}
-                        variant="outlined"/>
-
-                    <TextField
-                        id="date"
-                        label="Date of birth"
-                        type="date"
-                        value={birthday}
-                        onChange = {newValue => {let newDate: Date | null; newDate = new Date(newValue.target.value); if (newDate.getFullYear() > 1000) setBirthday(newDate)}}
-                        className = 'inputDate'
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        variant="outlined"
-                        />
-
-                    <FormControl
-                        variant="outlined"
-                        error={displayError(FIELD.SEX)}>
-                        <InputLabel id="demo-simple-select-error-label">Gender</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-error-label"
-                            id="demo-simple-select-error"
-                            value={sex}
-                            onChange={newValue => setSex(newValue.target.value as string)}
-                            >
-                            <MenuItem value={SEX.NONE}>
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={SEX.MALE}>{SEX.MALE}</MenuItem>
-                            <MenuItem value={SEX.FEMALE}>{SEX.FEMALE}</MenuItem>
-                            <MenuItem value={SEX.NOT_INFORM}>{SEX.NOT_INFORM}</MenuItem>
-                        </Select>
-                        <FormHelperText>{displayHelperText(FIELD.SEX)}</FormHelperText>
-                    </FormControl>
-
-            </form>
-
-            <div className = 'formSubmit'>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    className='submitButton'
-                    onClick = {handleRegister}>
-                    Register
-                </Button>
-            </div>
-        </div>
-    );
 }
+
+export default connect((state: IStore) => ({
+    userAuthenticated: state.userAuthenticated}) ) (RegisterComponent)
