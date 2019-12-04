@@ -1,5 +1,10 @@
 // React Imports
-import React from 'react';
+import React, {Component} from 'react';
+
+// Redux
+import { connect } from 'react-redux';
+import * as Actions from '../../Store/actions';
+import { IStore } from '../../Store/index';
 
 // Styles
 import '../../Pages/Login/styles.css'
@@ -19,32 +24,51 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 // Services
 import {Utilities} from '../../Services/Utilities';
+import User from '../../Model/User';
 
 // Icons
 
-export default function LoginComponent(){
-    // Enums
-    enum FIELD {
-        EMAIL,
-        FIRSTNAME,
-        LASTNAME,
-        PASSWORD,
-        SEX,
-        BIRHTDAY
-    }
 
-    // State
-    const [submitted, setSubmitted] = React.useState(false);
+// Enums
+enum FIELD {
+    EMAIL,
+    FIRSTNAME,
+    LASTNAME,
+    PASSWORD,
+    SEX,
+    BIRHTDAY
+}
+
+// Interfaces
+interface IProps {
+    userAuthenticated?: User
+}
+
+interface IState {
+    submitted: boolean,
+    email: string,
+    password: string
+}
+
+class LoginComponent extends Component<IProps, IState>{
+    constructor(props: IProps){
+        super(props);
+
+        this.state = {
+            submitted: false,
+            email: '',
+            password: ''
+        };
+    }
     
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
-
     // Functions and consts
-    const displayError = (field: FIELD): boolean => {
-        return displayHelperText(field).length > 0;
+    displayError = (field: FIELD): boolean => {
+        return this.displayHelperText(field).length > 0;
     }
 
-    const displayHelperText = (field: FIELD): string => {
+    displayHelperText = (field: FIELD): string => {
+        const {submitted, email, password} = this.state;
+
         if (!submitted)
             return '';
 
@@ -66,50 +90,59 @@ export default function LoginComponent(){
         }
     }    
     
-    async function handleRegister () {
-        setSubmitted(true);
+    handleRegister = async () => {
+        this.setState({submitted: true});
     }
     
-    return(
-        <div className="componentContainer componentLoginContainer">
-            <div className="componentWelcome">
-                Good to see you again. Welcome!
+    render(){
+        //console.log('Login Component - this.props.userAuthenticated');
+        //console.log(this.props.userAuthenticated);
+
+        const {email, password} = this.state;
+        return(
+            <div className="componentContainer componentLoginContainer">
+                <div className="componentWelcome">
+                    Good to see you again. Welcome!
+                </div>
+
+                <form className="componentForm componentLoginForm">
+                    <TextField
+                        required
+                        error = {this.displayError(FIELD.EMAIL)}
+                        value={email}
+                        onChange = {newValue => this.setState({email: newValue.target.value}) }
+                        id="email"
+                        label="E-mail"
+                        helperText = {this.displayHelperText(FIELD.EMAIL)}
+                        variant="outlined"/>
+
+                    <TextField 
+                        required
+                        error = {this.displayError(FIELD.PASSWORD)}
+                        value={password}
+                        onChange = {newValue => this.setState({password: newValue.target.value})}
+                        id="password"
+                        label="Password"
+                        type="password"
+                        helperText = {this.displayHelperText(FIELD.PASSWORD)}
+                        variant="outlined"/>
+
+                </form>
+
+                <div className="formSubmit">
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        className='submitButton'
+                        onClick = {this.handleRegister}>
+                        Login
+                    </Button>
+                </div>
+
             </div>
-
-            <form className="componentForm componentLoginForm">
-                <TextField
-                    required
-                    error = {displayError(FIELD.EMAIL)}
-                    value={email}
-                    onChange = {newValue => setEmail(newValue.target.value)}
-                    id="email"
-                    label="E-mail"
-                    helperText = {displayHelperText(FIELD.EMAIL)}
-                    variant="outlined"/>
-
-                <TextField 
-                    required
-                    error = {displayError(FIELD.PASSWORD)}
-                    value={password}
-                    onChange = {newValue => setPassword(newValue.target.value)}
-                    id="password"
-                    label="Password"
-                    type="password"
-                    helperText = {displayHelperText(FIELD.PASSWORD)}
-                    variant="outlined"/>
-
-            </form>
-
-            <div className="formSubmit">
-                <Button
-                    variant="contained"
-                    color="primary"
-                    className='submitButton'
-                    onClick = {handleRegister}>
-                    Login
-                </Button>
-            </div>
-
-        </div>
-    );
+        );
+    }
 }
+
+export default connect((state: IStore) => ({
+    userAuthenticated: state.userAuthenticated}) ) (LoginComponent)

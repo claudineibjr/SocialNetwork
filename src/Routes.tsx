@@ -1,5 +1,8 @@
 import React from 'react';
 
+import { Provider } from 'react-redux';
+import store from './Store';
+
 import { BrowserRouter, Route } from 'react-router-dom';
 
 import Login from './Pages/Login';
@@ -14,11 +17,13 @@ export enum enumROUTES{
 
 export default function Routes(){
     return(
-        <BrowserRouter>
-            <Route path='/' exact component={Login}/>
-            <Route path='/login' component={Login}/>
-            <Route path='/home' component={Home}/>
-            <Route path='/profile' component={Profile}/>
-        </BrowserRouter>
+        <Provider store={store} >
+            <BrowserRouter>
+                <Route path='/' exact component={Login}/>
+                <Route path='/login' component={Login}/>
+                <Route path='/home' component={Home}/>
+                <Route path='/profile' component={Profile}/>
+            </BrowserRouter>
+        </Provider>
     )
 }

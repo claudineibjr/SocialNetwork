@@ -1,5 +1,7 @@
 // React Imports
-import React from 'react';
+import React, { Component } from 'react';
+
+// Redux
 
 // Styles
 import './styles.css'
@@ -14,22 +16,39 @@ import LoginComponent from '../../Components/LoginComponent';
 import RegisterComponent from '../../Components/RegisterComponent';
 
 // Model
+import User from '../../Model/User';
 
 // Services
 
 // Icons
 
+// Enums
+enum TABS {
+    Login,
+    Register
+}
 
-export default function Login(){
-    enum TABS {
-        Login,
-        Register
+// Interfaces
+interface IProps {
+    userAuthenticated?: User,
+    dispatch: any
+}
+
+interface IState {
+    selectedTab: TABS
+}
+
+class Login extends Component<IProps, IState>{
+    state = {
+        selectedTab: TABS.Login
+    };
+
+    setSelectedTab(newValue: TABS){
+        this.setState({selectedTab: newValue});
     }
-
-    const [selectedTab, setSelectedTab] = React.useState(TABS.Login);
-
-    function renderActiveTab(){
-        switch (selectedTab) {
+    
+    renderActiveTab(){
+        switch (this.state.selectedTab) {
             case TABS.Login:
                 return <LoginComponent/>
             case TABS.Register:
@@ -39,23 +58,27 @@ export default function Login(){
         }
     }
 
-    return(
-        <div className="login-container">
-            {renderActiveTab()}
+    render(){
+        return(
+            <div className="login-container">
+                {this.renderActiveTab()}
 
-            <Paper square className='bottomTabs'>
-                <Tabs
-                value={selectedTab}
-                onChange={(event, value) => setSelectedTab(value) }
-                indicatorColor="primary"
-                textColor="primary"
-                centered
-                aria-label="icon label tabs example">
-                    <Tab value = {TABS.Login}    label="Login" />
-                    <Tab value = {TABS.Register} label="Create account" />
-                </Tabs>
-            </Paper>
+                <Paper square className='bottomTabs'>
+                    <Tabs
+                    value={this.state.selectedTab}
+                    onChange={(event, value) => this.setSelectedTab(value) }
+                    indicatorColor="primary"
+                    textColor="primary"
+                    centered
+                    aria-label="icon label tabs example">
+                        <Tab value = {TABS.Login}    label="Login" />
+                        <Tab value = {TABS.Register} label="Create account" />
+                    </Tabs>
+                </Paper>
 
-      </div>
-    );
+        </div>
+        );
+    }
 }
+
+export default Login;
