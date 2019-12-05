@@ -2,7 +2,9 @@
 import React, {Component} from 'react';
 
 // Redux
+import { connect } from 'react-redux';
 import store, { IStore } from '../../Store/index';
+import * as Actions from '../../Store/actions';
 
 // Styles
 import './styles.css'
@@ -31,7 +33,7 @@ import { PostVisibility } from '../../Model/Post';
 // Icons
 
 interface IProps {
-
+    dispatch: any
 }
 
 interface IState {
@@ -102,6 +104,7 @@ class CreatePost extends Component<IProps, IState>{
             
             const post: Post = new Post(user, new Date(), postContent, visibility);
             PostDB.createPost(post).then((idPost) => {
+                this.props.dispatch(Actions.createPost(post));
                 this.setState({submitted: false, showSnackBar: true, postContent: ''});
             });
         }
@@ -167,4 +170,4 @@ class CreatePost extends Component<IProps, IState>{
     }
 }
 
-export default CreatePost;
+export default connect((state: IStore) => ({}) ) (CreatePost)

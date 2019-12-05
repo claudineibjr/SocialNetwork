@@ -2,9 +2,11 @@ import { createStore } from 'redux';
 import { ACTIONS } from './actions';
 
 import User from '../Model/User';
+import Post from '../Model/Post';
 
 export interface IStore {
-    userAuthenticated?: User
+    userAuthenticated?: User,
+    posts?: Array<Post>
 }
 
 export interface IAction extends IStore{
@@ -12,7 +14,8 @@ export interface IAction extends IStore{
 }
 
 const INITIAL_STATE: IStore = {
-    userAuthenticated: undefined
+    userAuthenticated: undefined,
+    posts: new Array<Post>()
 }
 
 function reducer(state: any = INITIAL_STATE, action: IAction){
@@ -21,7 +24,9 @@ function reducer(state: any = INITIAL_STATE, action: IAction){
             return {
                 ...state,
                 userAuthenticated: action.userAuthenticated
-            }}
+            }
+        }
+        
         case (ACTIONS.LOGOFF):{
             return{
                 ...state,
@@ -29,18 +34,16 @@ function reducer(state: any = INITIAL_STATE, action: IAction){
             }
         }
 
+        case ACTIONS.CREATE_POST : case ACTIONS.REFRESH_POSTS: {
+            return {
+                ...state,
+                posts: action.posts
+            }
+        }
+
         default:
             return state;
     }
-    
-    if (action.type === ACTIONS.LOGIN){
-        return {
-            ...state,
-            userAuthenticated: action.userAuthenticated
-        }
-    }
-
-    return state;
 }
 
 const store = createStore(reducer);

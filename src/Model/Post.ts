@@ -38,25 +38,23 @@ export default class Post {
         }
     }
 
-    static async getPost(_post: any, loadHistory: boolean = false): Promise<Post> {
+    static async getPost(_post: any, loadUser: boolean = false, loadHistory: boolean = false): Promise<Post> {
         let id: string = _post.id;
-        let _user: string = _post._user;
+        let _user: string = _post.user;
         let date: Date = new Date(_post.date);
         let content: string = _post.content;
         let visibility: PostVisibility = _post.visibility;
         let history: Array<PostEdited> = _post.history ? Object.keys(_post.history).map(iCount => _post.history[iCount]) : new Array<PostEdited>();
 
-        return new Promise((resolve, reject) => {
-            UserDB.getUser(_user).then((user) => {
-                let post: Post = new Post(user, date, content, visibility);
-                post.id = id;
-                post._user = _user;
-                post.history = history;
-        
-                resolve(post);
-            });
-        })
+        return new Promise(async (resolve, reject) => {
+            let user = await UserDB.getUser(_user);
+            
+            let post: Post = new Post(user, date, content, visibility);
+            post.id = id;
+            post._user = _user;
+            post.history = history;
 
-;
+            resolve(post);
+        });
     }
 }
