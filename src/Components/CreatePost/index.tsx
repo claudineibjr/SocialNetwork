@@ -36,7 +36,8 @@ interface IState {
     submitted: boolean,
     visibility: PostVisibility,
     postContent: string,
-    showSnackBar: boolean
+    showSnackBar: boolean,
+    textFieldFocused: boolean
 }
 
 enum FIELD {
@@ -53,7 +54,8 @@ class CreatePost extends Component<IProps, IState>{
             submitted: false,
             visibility: PostVisibility.PRIVATE,
             postContent: '',
-            showSnackBar: false
+            showSnackBar: false,
+            textFieldFocused: false
         }
 
         // Initializing map
@@ -111,7 +113,7 @@ class CreatePost extends Component<IProps, IState>{
     handleCloseSnackBar = () => this.setState({showSnackBar: false})
     
     render(){
-        const {visibility, postContent, showSnackBar} = this.state;
+        const {visibility, postContent, showSnackBar, textFieldFocused} = this.state;
 
         this.setHelpersText();
         return(
@@ -128,7 +130,9 @@ class CreatePost extends Component<IProps, IState>{
                         id="outlined-multiline-static"
                         label="What's going on?"
                         multiline
-                        rows="4"
+                        rows={textFieldFocused || postContent.length > 0 ? "4" : "1"}
+                        onFocus = {() => this.setState({textFieldFocused: true})}
+                        onBlur = {() => this.setState({textFieldFocused: false})}
                         value={postContent}
                         onChange = {newValue => this.setPostContent(newValue.target.value)}
                         margin="normal"
