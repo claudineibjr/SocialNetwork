@@ -27,14 +27,7 @@ export class PostDB {
     static getAvailablePosts(): Promise<Array<Post>> {
         initializeFirebase();
         
-        let posts: Array<Post> = new Array<Post>();
-
         return new Promise<Array<Post>>((resolve, reject) => {
-            /*posts.push(new Post(new User('claudineibjr', 'Cla', Gender.MALE), new Date(), 'A'));
-            posts.push(new Post(new User('claudineibjr', 'Cla', Gender.MALE), new Date(), 'B'));
-            posts.push(new Post(new User('claudineibjr', 'Cla', Gender.MALE), new Date(), 'C'));
-            resolve(posts);*/
-
             firebaseApp.database().ref('posts/').orderByChild('date').once('value', 
                 (dataSnapshot) => {
                     this.getPostsFromDataSnapshot(dataSnapshot).then((values) => {
@@ -62,14 +55,23 @@ export class PostDB {
         });
     }
 
-    /*static getPost(userID: string): Promise<User> {
+    static deletePost(postID: string) : Promise<void> {
         initializeFirebase();
 
-        return new Promise((resolve, reject) => {
-            firebaseApp.database().ref('users/' + userID).once('value', (dataSnapshot) => {
-                const user: User = User.getUser(dataSnapshot.exportVal());
-                resolve(user);
+        return new Promise<void>((resolve) => {
+            firebaseApp.database().ref('posts/' + postID).remove().then(() => {
+                resolve();
             });
-        })
-    }*/
+        });
+    }
+
+    static updatePost(post: Post) : Promise<void> {
+        initializeFirebase();
+
+        return new Promise<void>(async (resolve) => {
+            await firebaseApp.database().ref('posts/' + post.id).update(post.getUpdatable())
+            resolve();
+        });
+    }
+
 }

@@ -74,7 +74,9 @@ class Home extends Component<IProps, IState> {
         let {posts, userAuthenticated} = this.props;
 
         const componentPosts =  posts!.map((post, key) => 
-                                    <PostComponent post = {post}/>
+                                    <PostComponent
+                                        key = {post.id}
+                                        post = {post}/>
                                 );
 
         return(

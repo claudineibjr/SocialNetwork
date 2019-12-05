@@ -6,7 +6,9 @@ export enum ACTIONS {
     LOGIN,
     LOGOFF,
     CREATE_POST,
-    REFRESH_POSTS
+    REFRESH_POSTS,
+    DELETE_POST,
+    UPDATE_POST
 }
 
 export function login(userAuthenticated: User): IAction {
@@ -35,6 +37,28 @@ export function createPost(post: Post): IAction {
 export function refreshPosts(posts: Array<Post>): IAction {
     return {
         type: ACTIONS.REFRESH_POSTS,
+        posts: posts
+    }
+}
+
+export function deletePost(post: Post): IAction {
+    let posts: Array<Post> = (store.getState() as IStore).posts!;
+    const postToDeleteIndex: number = posts.indexOf(post);
+    posts.splice(postToDeleteIndex, 1);
+
+    return {
+        type: ACTIONS.DELETE_POST,
+        posts: posts
+    }
+}
+
+export function updatePost(post: Post): IAction {
+    let posts: Array<Post> = (store.getState() as IStore).posts!;
+    const postToDeleteIndex: number = posts.indexOf(post);
+    posts[postToDeleteIndex] = post;
+
+    return {
+        type: ACTIONS.UPDATE_POST,
         posts: posts
     }
 }

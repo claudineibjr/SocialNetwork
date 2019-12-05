@@ -34,7 +34,7 @@ function reducer(state: any = INITIAL_STATE, action: IAction){
             }
         }
 
-        case ACTIONS.CREATE_POST : case ACTIONS.REFRESH_POSTS: {
+        case ACTIONS.CREATE_POST : case ACTIONS.REFRESH_POSTS: case ACTIONS.DELETE_POST: case ACTIONS.UPDATE_POST: {
             return {
                 ...state,
                 posts: action.posts
