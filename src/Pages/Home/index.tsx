@@ -5,6 +5,7 @@ import React, {Component} from 'react';
 import './styles.css'
 
 // Material-UI Components
+import Button from '@material-ui/core/Button';
 
 // Components
 import CreatePost from '../../Components/CreatePost';
@@ -17,6 +18,7 @@ import User, { Gender } from '../../Model/User';
 // Services
 
 // Icons
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 interface Props {
 
@@ -38,14 +40,32 @@ export default class Home extends Component<Props, State>{
         }
     }
 
+    handleLogoff = () => {
+        
+    }
+
     render(){
-        console.log(this.state.posts);
         const posts =   this.state.posts.map((post, key) => 
                             <PostComponent post = {post}/>
                         );
 
         return(
             <div className="homePageContainer">
+                <div className="headerContainer">
+                    <div className="profileContainer">
+                        {this.state.user.getFullName()}
+                    </div>
+
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleLogoff}
+                        startIcon={<ExitToAppIcon />}>
+                        Logoff
+                    </Button>
+
+                </div>
+
                 <CreatePost/>
                 
                 {posts}

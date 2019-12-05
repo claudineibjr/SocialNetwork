@@ -19,7 +19,9 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
+import Checkbox from '@material-ui/core/Checkbox';
 import CloseIcon from '@material-ui/icons/Close';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 // Components
 import CustomSnackBar, {VARIANT} from '../CustomSnackBar';
@@ -56,7 +58,8 @@ interface IState {
     email: string,
     password: string,
     showSnackBar: boolean,
-    snackBarText: string
+    snackBarText: string,
+    keepConnected: boolean
 }
 
 class LoginComponent extends Component<IProps, IState>{
@@ -70,7 +73,8 @@ class LoginComponent extends Component<IProps, IState>{
             email: '',
             password: '',
             showSnackBar: false,
-            snackBarText: ''
+            snackBarText: '',
+            keepConnected: true
         };
 
         // Initializing map
@@ -78,6 +82,12 @@ class LoginComponent extends Component<IProps, IState>{
             this.errorMessages.set(parseInt(field), '');
     }
     
+    componentWillMount = () => {
+        const userID = localStorage.getItem('@SocialNetwork/uid');
+        if (userID)
+            this.loginUser(userID);
+    }
+
     // Functions and consts
     displayError = (field: FIELD): boolean => {
         return this.displayHelperText(field).length > 0;
@@ -108,7 +118,7 @@ class LoginComponent extends Component<IProps, IState>{
             return '';
     }
     
-    handleRegister = async () => {
+    handleLogin = async () => {
         this.setState({submitted: true});
 
         let error: boolean = false;
@@ -118,22 +128,31 @@ class LoginComponent extends Component<IProps, IState>{
         });
 
         if (!error){
-            const {email, password} = this.state;
+            const {email, password, keepConnected} = this.state;
             FirebaseAuth.loginUser(email, password).then((info) => {
-                UserDB.getUser(info.user!.uid).then((user) => {
-                    this.props.dispatch(Actions.login(user));
-                });
+                if (keepConnected)
+                    localStorage.setItem('@SocialNetwork/uid', info.user!.uid);
+                else
+                    localStorage.removeItem('@SocialNetwork/uid');
+
+                this.loginUser(info.user!.uid);
             }).catch(async (error) => {
                 await this.setState({snackBarText: error.message})
                 this.setState({showSnackBar: true});
             });
         }
     }
+
+    loginUser = (userUID: string) => {
+        UserDB.getUser(userUID).then((user) => {
+            this.props.dispatch(Actions.login(user));
+        });
+    }
     
     handleClose = () => this.setState({showSnackBar: false});
 
     render(){   
-        const {email, password, showSnackBar, snackBarText} = this.state;
+        const {email, password, showSnackBar, snackBarText, keepConnected} = this.state;
         
         this.setHelpersText();
         return(
@@ -170,6 +189,17 @@ class LoginComponent extends Component<IProps, IState>{
                         helperText = {this.displayHelperText(FIELD.PASSWORD)}
                         variant="outlined"/>
 
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={keepConnected}
+                                onChange={newValue => this.setState({keepConnected: newValue.target.checked }) }
+                                value={keepConnected}
+                                color="primary"
+                            />
+                        }
+                        label="Keep connected"/>
+
                 </form>
 
                 <div className="formSubmit">
@@ -177,7 +207,7 @@ class LoginComponent extends Component<IProps, IState>{
                         variant="contained"
                         color="primary"
                         className='submitButton'
-                        onClick = {this.handleRegister}>
+                        onClick = {this.handleLogin}>
                         Login
                     </Button>
                 </div>
