@@ -90,9 +90,9 @@ class PostComponent extends Component<Props, State>{
             this.handleCancelEdit();
 
             let {post} = this.props;
-            post.history.push(new PostEdited(post.date, post.content));
+            post.history.push(new PostEdited(post.getDate(), post.content));
             post.content = editingText;
-            post.date = new Date();
+            post.setDate(new Date());
             await PostDB.updatePost(post);
             this.props.dispatch(Actions.updatePost(post));
         }
@@ -162,7 +162,7 @@ class PostComponent extends Component<Props, State>{
                     <CardHeader
                         avatar = {<Avatar aria-label="recipe"> C </Avatar>}
                         title={post.user.getFullName()}
-                        subheader={Utilities.formatDate(post.date, true)}/>
+                        subheader={Utilities.formatDate(post.getDate(), true)}/>
                     
                     <CardContent>
                         {!editingPost ? (
@@ -180,7 +180,7 @@ class PostComponent extends Component<Props, State>{
 
                     </CardContent>
 
-                    {userAuthenticated && userAuthenticated!.id === post._user &&
+                    {userAuthenticated && userAuthenticated!.id === post.userStr &&
                         <CardActions disableSpacing className = 'cardActions'>
                             <div className="cardActions">
                                 <IconButton onClick={this.handleEdit} aria-label="edit">

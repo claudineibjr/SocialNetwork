@@ -16,7 +16,7 @@ export class PostDB {
         initializeFirebase();
         
         return new Promise<Array<Post>>((resolve, reject) => {
-            firebaseApp.database().ref('posts/').orderByChild('date').once('value', 
+            firebaseApp.database().ref('posts/').orderByChild('inverseDate').once('value', 
                 (dataSnapshot) => {
                     this.getPostsFromDataSnapshot(dataSnapshot).then((values) => {
                         resolve(values);

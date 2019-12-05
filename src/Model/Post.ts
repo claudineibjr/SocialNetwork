@@ -10,28 +10,40 @@ export enum PostVisibility{
 export default class Post {
     id: string = '';
     user: User; // Not persisted on database
-    date: Date;
+    private _date: Date;
+    private _inverseDate: number; // Datetime of post inverted to sort the post descending on Firebase
     content: string;
     history: Array<PostEdited>;
     visibility: PostVisibility;
 
-    _user: string; // UserID - Persisted on database
+    userStr: string; // UserID - Persisted on database
 
     constructor(user: User, date: Date, content: string, visibility: PostVisibility = PostVisibility.PUBLIC){
         this.user = user;
-        this._user = user.id;
-        this.date = date;
+        this.userStr = user.id;
+        this._date = date;
+        this._inverseDate = - date.getTime();
         this.content = content;
         this.visibility = visibility;
 
         this.history = new Array<PostEdited>();
     }
 
+    setDate(date: Date){
+        this._date = date;
+        this._inverseDate = - date.getTime();
+    }
+
+    getDate(): Date{
+        return this._date;
+    }
+
     getUpdatable() {
         return {
             'id': this.id,
-            'user': this._user,
-            'date': this.date.getTime(),
+            'user': this.userStr,
+            'date': this._date.getTime(),
+            'inverseDate': this._inverseDate,
             'content': this.content,
             'visibility': this.visibility,
             'history': this.history
@@ -51,7 +63,7 @@ export default class Post {
             
             let post: Post = new Post(user, date, content, visibility);
             post.id = id;
-            post._user = _user;
+            post.userStr = _user;
             post.history = history;
 
             resolve(post);
