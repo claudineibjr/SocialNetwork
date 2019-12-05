@@ -8,7 +8,6 @@ import store, { IStore } from '../../Store/index';
 
 // Styles
 import '../../Pages/Login/styles.css'
-import profilePicture from '../../Resources/ProfilePicture.png';
 
 // Material-UI Components
 import TextField from '@material-ui/core/TextField';

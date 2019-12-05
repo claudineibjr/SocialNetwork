@@ -12,22 +12,13 @@ import '../../Pages/Login/styles.css'
 // Material-UI Components
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
 import Checkbox from '@material-ui/core/Checkbox';
-import CloseIcon from '@material-ui/icons/Close';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 // Components
 import CustomSnackBar, {VARIANT} from '../CustomSnackBar';
 
 // Model
-import User, { Gender } from '../../Model/User';
+import User from '../../Model/User';
 
 // Services
 import {Utilities} from '../../Services/Utilities';
@@ -35,7 +26,7 @@ import {FirebaseAuth} from '../../Services/Firebase/FirebaseAuth';
 import {UserDB} from '../../Services/Firebase/Database/UserDB';
 
 // Icons
-
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 // Enums
 enum FIELD {

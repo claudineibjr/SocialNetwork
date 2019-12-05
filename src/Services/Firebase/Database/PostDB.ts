@@ -1,7 +1,6 @@
 import {firebaseApp, initializeFirebase} from '../Firebase';
 
 import Post from '../../../Model/Post';
-import User, { Gender } from '../../../Model/User';
 
 export class PostDB {
     static async createPost(post: Post): Promise<string> {
@@ -11,17 +10,6 @@ export class PostDB {
         post.id = reference.key!;
         await firebaseApp.database().ref('posts/' + reference.key).update(post.getUpdatable());
         return new Promise((resolve, reject) => resolve(reference.key!));
-    }
-
-    static getPost(postID: string): Promise<Post> {
-        initializeFirebase();
-
-        return new Promise<Post>((resolve) => {
-            firebaseApp.database().ref('posts/' + postID).once('value', async (dataSnapshot) => {
-                const post = await Post.getPost(dataSnapshot.exportVal());
-                resolve(post);
-            });
-        });
     }
 
     static getAvailablePosts(): Promise<Array<Post>> {

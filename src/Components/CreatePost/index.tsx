@@ -13,22 +13,18 @@ import './styles.css'
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
 
 // Components
 import CustomSnackBar, {VARIANT} from '../CustomSnackBar';
 
 // Model
-import Post from '../../Model/Post';
+import Post, {PostVisibility} from '../../Model/Post';
 import User from '../../Model/User';
 
 // Services
-import {Utilities} from '../../Services/Utilities';
 import {PostDB} from '../../Services/Firebase/Database/PostDB';
-import { PostVisibility } from '../../Model/Post';
 
 // Icons
 

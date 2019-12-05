@@ -1,5 +1,6 @@
 // React Imports
 import React, {Component} from 'react';
+import { PossibleRoutes } from '../../Routes';
 
 // Redux
 import { connect } from 'react-redux';
@@ -18,16 +19,15 @@ import CreatePost from '../../Components/CreatePost';
 import PostComponent from '../../Components/PostComponent';
 
 // Model
-import Post, { PostVisibility } from '../../Model/Post';
-import User, { Gender } from '../../Model/User';
+import Post from '../../Model/Post';
+import User from '../../Model/User';
 
 // Services
 import {PostDB} from '../../Services/Firebase/Database/PostDB';
+import { UserDB } from '../../Services/Firebase/Database/UserDB';
 
 // Icons
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import { PossibleRoutes } from '../../Routes';
-import { UserDB } from '../../Services/Firebase/Database/UserDB';
 
 interface IProps {
     dispatch: any,
@@ -41,10 +41,6 @@ interface IState {
 }
 
 class Home extends Component<IProps, IState> {
-    constructor(props: IProps){
-        super(props);
-    }
-
     componentWillMount = async() => {
         if ( !(store.getState() as IStore).userAuthenticated ){
             const userID = localStorage.getItem('@SocialNetwork/uid');

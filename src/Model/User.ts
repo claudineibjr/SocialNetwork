@@ -39,7 +39,7 @@ export default class User{
             'firstName': this.firstName,
             'lastName': this.lastName,
             'gender': this.gender,
-            'birthday': this.birthday != undefined ? this.birthday.getTime() : null,
+            'birthday': this.birthday !== undefined ? this.birthday.getTime() : null,
             'friends': this._friends
         }
     }

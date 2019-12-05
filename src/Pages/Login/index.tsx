@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 
 // Router
-import { Link } from 'react-router-dom'
 import {PossibleRoutes} from '../../Routes';
 
 // Redux
