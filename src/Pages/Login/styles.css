@@ -71,3 +71,17 @@
 .submitButton{
     width: 100%;
 }
+
+.profilePicture{
+    display: flex;
+    flex-direction: row;
+}
+
+.profileIcons{
+    display: flex;
+    flex-direction: column;
+}
+
+.profilePicture{
+    max-height: 75px;
+}

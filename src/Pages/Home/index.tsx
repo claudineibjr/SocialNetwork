@@ -34,6 +34,7 @@ import User from '../../Model/User';
 // Services
 import {PostDB} from '../../Services/Firebase/Database/PostDB';
 import { UserDB } from '../../Services/Firebase/Database/UserDB';
+import {CloudStorage} from '../../Services/Firebase/CloudStorage';
 
 // Icons
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
@@ -56,7 +57,8 @@ interface IProps {
 
 interface IState {
     viewOption: ViewOption,
-    posts: Array<Post>
+    posts: Array<Post>,
+    userAvatar: any
 }
 
 class Home extends Component<IProps, IState> {
@@ -65,7 +67,8 @@ class Home extends Component<IProps, IState> {
 
         this.state = {
             viewOption: ViewOption.AllPosts,
-            posts: new Array<Post>()
+            posts: new Array<Post>(),
+            userAvatar: undefined
         };
     }
 
@@ -77,6 +80,9 @@ class Home extends Component<IProps, IState> {
                 this.props.dispatch(Actions.login(user));
             }
         }
+
+        const avatar = await this.userAvatar();
+        this.setState({userAvatar: avatar});
 
         this.loadPostsFromDB();
     }
@@ -135,15 +141,31 @@ class Home extends Component<IProps, IState> {
         this.setState({viewOption: newViewOption}, () => this.loadPostsAccordingToViewOption());
     }
 
+    userAvatar = (): Promise<any> => {
+        const {userAuthenticated} = this.props;
+
+        return new Promise<any>((resolve) => {
+            if (userAuthenticated!.hasImage){
+                CloudStorage.downloadUserImage(userAuthenticated!.id).then((pictureURL) => {
+                    resolve( (<Avatar alt={userAuthenticated!.getFirstLetter()} src={pictureURL} />) )
+                });
+            }else{
+                resolve( <Avatar aria-label="recipe"> {userAuthenticated!.getFirstLetter()} </Avatar> );
+            }
+        });
+    }
+
     render(){
         let {userAuthenticated} = this.props;
-        const {viewOption, posts} = this.state;
+        const {viewOption, posts, userAvatar} = this.state;
 
         const componentPosts =  posts.map((post, key) => 
                                     <PostComponent
                                         key = {post.id}
                                         post = {post}/>
                                 );
+
+
 
         return(
             <div className="homePageContainer">
@@ -152,7 +174,7 @@ class Home extends Component<IProps, IState> {
                     <div className="onlyAuthenticated">
                         <div className="headerContainer">
                             <div className="profileContainer">
-                                <Avatar aria-label="recipe"> {userAuthenticated.getFirstLetter()} </Avatar>
+                                {userAvatar}
                                 <div className="profileName">
                                     {userAuthenticated!.getFullName()}
                                 </div>

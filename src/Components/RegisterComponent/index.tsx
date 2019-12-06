@@ -17,6 +17,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
+import IconButton from '@material-ui/core/IconButton';
 
 // Components
 import CustomSnackBar, {VARIANT} from '../CustomSnackBar';
@@ -28,8 +29,11 @@ import User, {Gender} from '../../Model/User';
 import {Utilities} from '../../Services/Utilities';
 import {FirebaseAuth} from '../../Services/Firebase/FirebaseAuth';
 import {UserDB} from '../../Services/Firebase/Database/UserDB';
+import {CloudStorage} from '../../Services/Firebase/CloudStorage';
 
 // Icons
+import PhotoCamera from '@material-ui/icons/PhotoCamera';
+import BlockIcon from '@material-ui/icons/Block';
 
 // Enums
 enum FIELD {
@@ -37,8 +41,7 @@ enum FIELD {
     FIRSTNAME,
     LASTNAME,
     PASSWORD,
-    SEX,
-    BIRHTDAY
+    SEX
 }
 
 // Interfaces
@@ -54,9 +57,10 @@ interface IState {
     lastName: string,
     password: string,
     sex: Gender,
-    birthday?: Date,
     showSnackBar: boolean,
-    snackBarText: string
+    snackBarText: string,
+    pictureFile?: File,
+    picturePreviewURL: string
 }
 
 class RegisterComponent extends Component<IProps, IState>{
@@ -72,9 +76,10 @@ class RegisterComponent extends Component<IProps, IState>{
             lastName: '',
             password: '',
             sex: Gender.NOT_INFORM,
-            birthday: undefined,
             showSnackBar: false,
-            snackBarText: ''
+            snackBarText: '',
+            pictureFile: undefined,
+            picturePreviewURL: ''
         }
 
         // Initializing map
@@ -128,11 +133,16 @@ class RegisterComponent extends Component<IProps, IState>{
         });
 
         if (!error){
-            const {email, password, firstName, lastName, sex, birthday} = this.state;
-            let user: User = new User(email, firstName, sex, birthday, lastName);
+            const {email, password, firstName, lastName, sex, pictureFile} = this.state;
+            let user: User = new User(email, firstName, sex, lastName);
 
             FirebaseAuth.createUser(email, password).then(async (info) => {
                 user.id = info.user!.uid;
+                if (pictureFile){
+                    CloudStorage.uploadUserImage(user.id, pictureFile!);
+                    user.hasImage = true;
+                }
+
                 await UserDB.createUser(user);
                 this.props.dispatch(Actions.login(user));
             }).catch( async (error) => {
@@ -144,8 +154,29 @@ class RegisterComponent extends Component<IProps, IState>{
 
     handleClose = () => this.setState({showSnackBar: false});
 
+    handleImageSelected = (file: File) => {
+        if (file){
+            let fileReader: FileReader = new FileReader();
+            fileReader.onloadend = () => {
+                this.setState({
+                    pictureFile: file,
+                    picturePreviewURL: fileReader.result! as string
+                });
+            }
+
+            fileReader.readAsDataURL(file);
+        }
+    }
+
+    handleRemoveProfilePicture = () => {
+        this.setState({
+            pictureFile: undefined,
+            picturePreviewURL: ''
+        });
+    }
+
     render(){
-        const {email, password, firstName, lastName, sex, birthday, showSnackBar, snackBarText} = this.state;
+        const {email, password, firstName, lastName, sex, showSnackBar, snackBarText, picturePreviewURL} = this.state;
 
         this.setHelpersText();
         return(
@@ -201,24 +232,6 @@ class RegisterComponent extends Component<IProps, IState>{
                             helperText = {this.displayHelperText(FIELD.LASTNAME)}
                             variant="outlined"/>
     
-                        <TextField
-                            id="date"
-                            label="Date of birth"
-                            type="date"
-                            value={birthday}
-                            onChange = {newValue => {
-                                let newDate: Date | null;
-                                newDate = new Date(newValue.target.value);
-                                if (newDate.getFullYear() > 1000)
-                                    this.setState({birthday: newDate})
-                            }}
-                            className = 'inputDate'
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            variant="outlined"
-                            />
-    
                         <FormControl
                             variant="outlined"
                             error={this.displayError(FIELD.SEX)}>
@@ -235,6 +248,42 @@ class RegisterComponent extends Component<IProps, IState>{
                             </Select>
                             <FormHelperText>{this.displayHelperText(FIELD.SEX)}</FormHelperText>
                         </FormControl>
+
+                        <div className="profilePicture">
+
+                            <div className="profileIcons">
+
+                                <input
+                                    accept="image/*" 
+                                    className='inputUploadPicture'
+                                    type="file"
+                                    id='profileImage'
+                                    onChange = {newValue => this.handleImageSelected(newValue.target.files![0])} />
+                                <label htmlFor="profileImage">
+                                    <IconButton
+                                        color="primary"
+                                        aria-label="upload picture"
+                                        component="span">
+                                        <PhotoCamera />
+                                    </IconButton>
+                                </label>
+
+                                {picturePreviewURL && 
+                                    <IconButton
+                                        color="primary"
+                                        aria-label="upload picture"
+                                        onClick = {() => this.handleRemoveProfilePicture()}
+                                        component="span">
+                                        <BlockIcon />
+                                    </IconButton>
+                                }
+
+                            </div>
+
+                            {picturePreviewURL && 
+                                <img className = 'profilePicture' src={picturePreviewURL} />
+                            }
+                        </div>
     
                 </form>
     

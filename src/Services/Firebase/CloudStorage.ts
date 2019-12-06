@@ -15,6 +15,10 @@ export class CloudStorage {
         });
     }
 
+    static uploadUserImage(userID: string, imageFile: File): Promise<void> {
+        return this.uploadImage('users/' + userID, imageFile);
+    }
+
     static uploadPostImage(postID: string, imageFile: File): Promise<void> {
         return this.uploadImage('posts/' + postID, imageFile);
     }
@@ -28,6 +32,10 @@ export class CloudStorage {
                 resolve(URL);
             });
         })
+    }
+
+    static downloadUserImage(userID: string): Promise<string> {
+        return this.downloadImage('users/' + userID);
     }
 
     static downloadPostImage(postID: string): Promise<string> {

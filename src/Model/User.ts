@@ -10,22 +10,22 @@ export default class User{
     firstName: string;
     lastName: string;
     gender: Gender;
-    birthday?: Date;
     friends: Array<User>; // Not persisted on database
-    //posts
+    hasImage: boolean;
+    
 
     _friends: Array<string>; // Users ID - Persisted on database
 
-    constructor(email: string, firstName: string, gender: Gender, birthday?: Date,  lastName: string = ''){
+    constructor(email: string, firstName: string, gender: Gender, lastName: string = ''){
         this.email = email;
         this.firstName = firstName;
         this.gender = gender;
         
-        this.birthday = birthday;
         this.lastName = lastName;
         
         this.friends = new Array<User>();
         this._friends = new Array<string>();
+        this.hasImage = false;
     }
 
     getFirstLetter(): string{
@@ -43,8 +43,8 @@ export default class User{
             'firstName': this.firstName,
             'lastName': this.lastName,
             'gender': this.gender,
-            'birthday': this.birthday !== undefined ? this.birthday.getTime() : null,
-            'friends': this._friends
+            'friends': this._friends,
+            'hasImage': this.hasImage
         }
     }
 
@@ -54,16 +54,17 @@ export default class User{
         let firstName: string = _user.firstName;
         let lastName: string = _user.lastName;
         let gender: Gender = _user.gender;
-        let birthday: Date | undefined = _user.birthday ? new Date(_user.birthday) : undefined;
         let _friends: Array<string> = _user.friends ? Object.keys(_user.requests).map(iCount => _user.friends[iCount]) : new Array<string>();
         let friends: Array<User> = new Array<User>();
+        let hasImage: boolean = _user.hasImage;
         if (loadFriends)
             friends = new Array<User>();
 
-        let user: User = new User(email, firstName, gender, birthday, lastName);
+        let user: User = new User(email, firstName, gender, lastName);
         user.id = id;
         user._friends = _friends;
         user.friends = friends;
+        user.hasImage = hasImage;
 
         return user;
     }

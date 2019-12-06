@@ -132,7 +132,6 @@ class CreatePost extends Component<IProps, IState>{
     handleCloseSnackBar = () => this.setState({showSnackBar: false})
     
     handleImageSelected = (file: File) => {
-        console.log('toma trouxa');
         if (file){
             let fileReader: FileReader = new FileReader();
             fileReader.onloadend = () => {

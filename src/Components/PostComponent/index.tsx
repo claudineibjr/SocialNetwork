@@ -56,7 +56,8 @@ interface State {
     editingPost: boolean,
     editingText: string,
     picturePreviewURL: string,
-    hasPicture: boolean
+    hasPicture: boolean,
+    userAvatar: any
 }
 
 enum FIELD {
@@ -72,10 +73,16 @@ class PostComponent extends Component<Props, State>{
             editingPost: false,
             editingText: '',
             picturePreviewURL: '',
-            hasPicture: this.props.post.hasPicture
+            hasPicture: this.props.post.hasPicture,
+            userAvatar: undefined
         }
     }
     
+    componentDidMount = async() => {
+        const avatar = await this.userAvatar();
+        this.setState({userAvatar: avatar});
+    }
+
     componentWillMount = () => {
         const {post} = this.props;
 
@@ -232,9 +239,24 @@ class PostComponent extends Component<Props, State>{
         );
     }
 
+
+    userAvatar = (): Promise<any> => {
+        const {user} = this.props.post;
+
+        return new Promise<any>((resolve) => {
+            if (user.hasImage){
+                CloudStorage.downloadUserImage(user.id).then((pictureURL) => {
+                    resolve( (<Avatar alt={user.getFirstLetter()} src={pictureURL} />) )
+                });
+            }else{
+                resolve( <Avatar aria-label="recipe"> {user.getFirstLetter()} </Avatar> );
+            }
+        });
+    }
+
     render(){
         const {post, userAuthenticated} = this.props;
-        const {displayDeleteDialog, editingPost, editingText, picturePreviewURL} = this.state;
+        const {displayDeleteDialog, editingPost, editingText, picturePreviewURL, userAvatar} = this.state;
 
         let $postImage = null;
         if (editingPost){
@@ -277,7 +299,7 @@ class PostComponent extends Component<Props, State>{
 
                 <Card className='cardContainer'>
                     <CardHeader
-                        avatar = {<Avatar aria-label="recipe"> {post.user.getFirstLetter()} </Avatar>}
+                        avatar = {userAvatar}
                         title={post.user.getFullName()}
                         subheader={Utilities.formatDate(post.getDate(), true)}/>
                     
