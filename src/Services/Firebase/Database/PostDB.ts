@@ -1,6 +1,6 @@
 import {firebaseApp, initializeFirebase} from '../Firebase';
 
-import Post from '../../../Model/Post';
+import Post, { PostVisibility } from '../../../Model/Post';
 
 export class PostDB {
     static async createPost(post: Post): Promise<string> {
@@ -12,29 +12,67 @@ export class PostDB {
         return new Promise((resolve, reject) => resolve(reference.key!));
     }
 
-    static getAvailablePosts(): Promise<Array<Post>> {
+    private static getBaseQuery(): firebase.database.Query {
+        return firebaseApp.database().ref('posts/').orderByChild('inverseDate');
+    }
+
+    /*static getPosts(queryPost: QueryPosts, userID: string): Promise<Array<Post>>{
         initializeFirebase();
-        
+
         return new Promise<Array<Post>>((resolve, reject) => {
-            firebaseApp.database().ref('posts/').orderByChild('inverseDate').once('value', 
+            let firebaseQuery: firebase.database.Query;
+            
+            switch(queryPost){
+                case QueryPosts.AllPosts:{
+                    firebaseQuery = this.getBaseQuery();
+                    break;
+                }
+
+                case QueryPosts.Public: {
+                    firebaseQuery = this.getBaseQuery().orderByChild('visibility').equalTo(PostVisibility.PUBLIC);
+                    break;
+                }
+
+                case QueryPosts.Private: {
+                    firebaseQuery = this.getBaseQuery().orderByChild('visibility').equalTo(PostVisibility.PRIVATE);
+                    break;
+                }
+
+                case QueryPosts.My: {
+                    firebaseQuery = this.getBaseQuery().orderByChild('id').equalTo(userID);
+                    break;
+                }
+            }
+        });
+    }*/
+
+    static getAvailablePosts(userID: string): Promise<Array<Post>> {
+        initializeFirebase();
+
+        return new Promise<Array<Post>>((resolve, reject) => {
+            this.getBaseQuery().once('value', 
                 (dataSnapshot) => {
-                    this.getPostsFromDataSnapshot(dataSnapshot).then((values) => {
+                    this.getPostsFromDataSnapshot(dataSnapshot, userID).then((values) => {
                         resolve(values);
                     });
             });
         });
     }
 
-    static getPostsFromDataSnapshot(dataSnapshot: firebase.database.DataSnapshot): Promise<Array<Post>>{
+    static getPostsFromDataSnapshot(dataSnapshot: firebase.database.DataSnapshot, userID: string): Promise<Array<Post>>{
         return new Promise<Array<Post>>((resolve, reject) => {
             let promisesPosts: Array<Promise<Post>> = new Array<Promise<Post>>();
 
             dataSnapshot.forEach((childSnapshot) => {
-                promisesPosts.push(new Promise<Post>((resolve, reject) => {
-                    Post.getPost(childSnapshot.exportVal()).then((post) =>{
-                        resolve(post);
-                    });
-                }));
+                const publicPost: boolean = childSnapshot.exportVal().visibility === PostVisibility.PUBLIC;
+                const ownPost: boolean = childSnapshot.exportVal().user === userID;
+                if (publicPost || ownPost ){
+                    promisesPosts.push(new Promise<Post>((resolve, reject) => {
+                        Post.getPost(childSnapshot.exportVal()).then((post) =>{
+                            resolve(post);
+                        });
+                    }));
+                }
             });
             
             Promise.all(promisesPosts).then((values) => {

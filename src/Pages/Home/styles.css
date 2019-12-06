@@ -22,3 +22,11 @@
     font-size: 16pt;
     margin-left: 8px;
 }
+
+.appToolbar{
+    margin: 0px;
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-between;
+}

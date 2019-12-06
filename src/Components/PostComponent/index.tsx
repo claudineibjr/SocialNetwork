@@ -277,7 +277,7 @@ class PostComponent extends Component<Props, State>{
 
                 <Card className='cardContainer'>
                     <CardHeader
-                        avatar = {<Avatar aria-label="recipe"> C </Avatar>}
+                        avatar = {<Avatar aria-label="recipe"> {post.user.getFirstLetter()} </Avatar>}
                         title={post.user.getFullName()}
                         subheader={Utilities.formatDate(post.getDate(), true)}/>
                     

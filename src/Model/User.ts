@@ -28,6 +28,10 @@ export default class User{
         this._friends = new Array<string>();
     }
 
+    getFirstLetter(): string{
+        return this.firstName[0];
+    }
+
     getFullName(): string{
         return this.firstName + ' ' + this.lastName;
     }
