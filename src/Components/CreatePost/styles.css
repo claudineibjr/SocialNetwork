@@ -21,27 +21,50 @@
     font-size: 1.15em;
 }
 
+.postUploadPicture{
+    display: flex;
+    flex-direction: row;
+}
+
+.postUploadButtons{
+    display: flex;
+    flex-direction: column;
+}
+
+.postPicture{
+    max-height: 200px;
+}
+
 /*Bottom buttons */
 .bottomButtons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.postButtonOptions{
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
 }
 
-.bottomButtons > .MuiFormControl-root, .bottomButtons > .MuiButtonBase-root {
+.postButtonOptions > .MuiFormControl-root, .postButtonOptions > .MuiButtonBase-root {
     margin-right: 10px;
 }
 
-.bottomButtons .MuiInputBase-root, .bottomButtons > .MuiButtonBase-root{
+.postButtonOptions .MuiInputBase-root, .postButtonOptions > .MuiButtonBase-root{
     height: 40px;
 }
 
-.bottomButtons .MuiInputBase-root{
-    /*background: #9C27B0;*/
+.postButtonOptions .MuiInputBase-root{
     padding-right: 10px;
 }
 
-.bottomButtons > .MuiButtonBase-root{
+.postButtonOptions > .MuiButtonBase-root{
     padding-left: 15px;
     padding-right: 15px;
+}
+
+.inputUploadPicture{
+    display: none;
 }

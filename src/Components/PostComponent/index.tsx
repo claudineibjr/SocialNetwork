@@ -34,12 +34,15 @@ import PostEdited from '../../Model/PostEdited';
 // Services
 import {Utilities} from '../../Services/Utilities';
 import { PostDB } from '../../Services/Firebase/Database/PostDB';
+import { CloudStorage } from '../../Services/Firebase/CloudStorage';
 
 // Icons
 import SaveIcon from '@material-ui/icons/Save';
 import BlockIcon from '@material-ui/icons/Block';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import PhotoCamera from '@material-ui/icons/PhotoCamera';
+import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
 
 interface Props {
     key: string,
@@ -51,7 +54,9 @@ interface Props {
 interface State {
     displayDeleteDialog: boolean,
     editingPost: boolean,
-    editingText: string
+    editingText: string,
+    picturePreviewURL: string,
+    hasPicture: boolean
 }
 
 enum FIELD {
@@ -65,10 +70,22 @@ class PostComponent extends Component<Props, State>{
         this.state = {
             displayDeleteDialog: false,
             editingPost: false,
-            editingText: ''
+            editingText: '',
+            picturePreviewURL: '',
+            hasPicture: this.props.post.hasPicture
         }
     }
     
+    componentWillMount = () => {
+        const {post} = this.props;
+
+        if (post.hasPicture){
+            CloudStorage.downloadPostImage(post.id).then((pictureURL) => {
+                this.setState({picturePreviewURL: pictureURL});
+            });
+        }
+    }
+
     handleEdit = () => {
         this.setState({editingPost: true, editingText: this.props.post.content});
     }
@@ -84,7 +101,7 @@ class PostComponent extends Component<Props, State>{
     }
 
     handleSaveEdit = async () => {
-        const {editingText} = this.state;
+        const {editingText, hasPicture} = this.state;
         
         if (editingText.length > 0){
             this.handleCancelEdit();
@@ -93,6 +110,10 @@ class PostComponent extends Component<Props, State>{
             post.history.push(new PostEdited(post.getDate(), post.content));
             post.content = editingText;
             post.setDate(new Date());
+            post.hasPicture = hasPicture;
+            if (!hasPicture)
+                CloudStorage.deletePostImage(post.id);
+
             await PostDB.updatePost(post);
             this.props.dispatch(Actions.updatePost(post));
         }
@@ -109,6 +130,7 @@ class PostComponent extends Component<Props, State>{
         const {post} = this.props;
 
         PostDB.deletePost(post.id).then(() => {
+            CloudStorage.deletePostImage(post.id);
             this.props.dispatch(Actions.deletePost(post));
         });
     }
@@ -126,9 +148,104 @@ class PostComponent extends Component<Props, State>{
             return '';
     }
 
+    handleDeletePicture = () => {
+        const {id} = this.props.post;
+        this.setState({picturePreviewURL: '', hasPicture: false}, () => {
+            CloudStorage.deletePostImage(id);
+            this.handleSaveEdit();
+        });
+    }
+
+    handleChangePicture = (file: File, newPicture: boolean = false) => {
+        if (file){
+            let fileReader: FileReader = new FileReader();
+            fileReader.onloadend = () => {
+                this.setState({
+                    picturePreviewURL: fileReader.result! as string,
+                    hasPicture: newPicture ? true : this.state.hasPicture
+                });
+
+                this.handleSaveEdit();
+            }
+
+            const {id} = this.props.post;
+            CloudStorage.uploadPostImage(id, file!);
+            fileReader.readAsDataURL(file);
+        }
+    }
+
+    postImage_hasImageAndEditing = (picturePreviewURL: string) => {
+        return (
+            <div className="editingImagePost">
+                <img className = 'postPicture' src={picturePreviewURL} />
+                <div className="postImageEditingButtons">
+                    <IconButton 
+                        aria-label="cancel upload picture"
+                        onClick={this.handleDeletePicture}
+                        component="span">
+                        <BlockIcon />
+                    </IconButton>
+
+                    <input
+                        accept="image/*" 
+                        className='inputUploadPicture'
+                        type="file"
+                        id='post-inputImage'
+                        onChange = {newValue => this.handleChangePicture(newValue.target.files![0])} />
+                    <label htmlFor="post-inputImage">
+                        <IconButton
+                            color="primary"
+                            aria-label="upload picture"
+                            component="span">
+                            <SwapHorizIcon />
+                        </IconButton>
+                    </label>
+                </div>
+            </div>
+        );
+    }
+
+    postImage_hasntImageAndEditing = () => {
+        return (
+            <div>
+                <input
+                    accept="image/*" 
+                    className='inputUploadPicture'
+                    type="file"
+                    id='post-insertNewImage'
+                    onChange = {newValue => this.handleChangePicture(newValue.target.files![0], true)} />
+                <label htmlFor="post-insertNewImage">
+                <IconButton
+                    color="primary"
+                    aria-label="upload picture"
+                    component="span">
+                    <PhotoCamera />
+                </IconButton>
+                </label>
+            </div>
+        );
+    }
+
+    postImage_hasImageAndNotEditing = (picturePreviewURL: string) => {
+        return (
+            <img className = 'postPicture' src={picturePreviewURL} />
+        );
+    }
+
     render(){
         const {post, userAuthenticated} = this.props;
-        const {displayDeleteDialog, editingPost, editingText} = this.state;
+        const {displayDeleteDialog, editingPost, editingText, picturePreviewURL} = this.state;
+
+        let $postImage = null;
+        if (editingPost){
+            if (picturePreviewURL.length > 0){
+                $postImage = this.postImage_hasImageAndEditing(picturePreviewURL);
+            }else{
+                $postImage = this.postImage_hasntImageAndEditing();
+            }
+        }else{
+            $postImage = this.postImage_hasImageAndNotEditing(picturePreviewURL);
+        }
 
         return(
             <div className="postContainer">
@@ -166,7 +283,10 @@ class PostComponent extends Component<Props, State>{
                     
                     <CardContent>
                         {!editingPost ? (
-                            post.content
+                            <div className="postContent">
+                                {post.content}
+                                {$postImage}
+                            </div>
                         ) : (
                             <div className="editTextField">
                                 <TextField
@@ -175,6 +295,8 @@ class PostComponent extends Component<Props, State>{
                                     error = {this.displayError(FIELD.POST_CONTENT)}
                                     helperText = {this.displayHelperText(FIELD.POST_CONTENT)}
                                     onChange={newValue => this.setState({editingText: newValue.target.value}) }/>
+
+                                {$postImage}
                             </div>
                         )}
 

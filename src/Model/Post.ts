@@ -15,16 +15,18 @@ export default class Post {
     content: string;
     history: Array<PostEdited>;
     visibility: PostVisibility;
+    hasPicture: boolean;
 
     userStr: string; // UserID - Persisted on database
 
-    constructor(user: User, date: Date, content: string, visibility: PostVisibility = PostVisibility.PUBLIC){
+    constructor(user: User, date: Date, content: string, visibility: PostVisibility = PostVisibility.PUBLIC, hasPicture: boolean = false){
         this.user = user;
         this.userStr = user.id;
         this._date = date;
         this._inverseDate = - date.getTime();
         this.content = content;
         this.visibility = visibility;
+        this.hasPicture = hasPicture;
 
         this.history = new Array<PostEdited>();
     }
@@ -46,7 +48,8 @@ export default class Post {
             'inverseDate': this._inverseDate,
             'content': this.content,
             'visibility': this.visibility,
-            'history': this.history
+            'history': this.history,
+            'hasPicture': this.hasPicture
         }
     }
 
@@ -57,11 +60,12 @@ export default class Post {
         let content: string = _post.content;
         let visibility: PostVisibility = _post.visibility;
         let history: Array<PostEdited> = _post.history ? Object.keys(_post.history).map(iCount => _post.history[iCount]) : new Array<PostEdited>();
+        let hasPicture: boolean = _post.hasPicture;
 
         return new Promise(async (resolve, reject) => {
             let user = await UserDB.getUser(_user);
             
-            let post: Post = new Post(user, date, content, visibility);
+            let post: Post = new Post(user, date, content, visibility, hasPicture);
             post.id = id;
             post.userStr = _user;
             post.history = history;

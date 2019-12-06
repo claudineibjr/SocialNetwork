@@ -36,3 +36,28 @@
 .editTextField > .MuiFormControl-root{
     width: 100%;
 }
+
+.editingImagePost{
+    display: flex;
+    flex-direction: row;
+}
+
+.postImageEditingButtons{
+    margin-top: 10px;
+    margin-left: 5px;
+}
+
+.postContent{
+    display: flex;
+    flex-direction: column;
+}
+
+.postPicture {
+    max-height: 200px;
+    margin-top: 15px;
+    align-self: flex-start;
+}
+
+.postPictureEditing {
+    max-height: 125px;
+}

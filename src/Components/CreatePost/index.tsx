@@ -15,6 +15,7 @@ import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import IconButton from '@material-ui/core/IconButton';
 
 // Components
 import CustomSnackBar, {VARIANT} from '../CustomSnackBar';
@@ -25,8 +26,11 @@ import User from '../../Model/User';
 
 // Services
 import {PostDB} from '../../Services/Firebase/Database/PostDB';
+import {CloudStorage} from '../../Services/Firebase/CloudStorage';
 
 // Icons
+import PhotoCamera from '@material-ui/icons/PhotoCamera';
+import BlockIcon from '@material-ui/icons/Block';
 
 interface IProps {
     dispatch: any
@@ -37,7 +41,9 @@ interface IState {
     visibility: PostVisibility,
     postContent: string,
     showSnackBar: boolean,
-    textFieldFocused: boolean
+    textFieldFocused: boolean,
+    pictureFile?: File,
+    picturePreviewURL: string
 }
 
 enum FIELD {
@@ -55,7 +61,9 @@ class CreatePost extends Component<IProps, IState>{
             visibility: PostVisibility.PRIVATE,
             postContent: '',
             showSnackBar: false,
-            textFieldFocused: false
+            textFieldFocused: false,
+            pictureFile: undefined,
+            picturePreviewURL: ''
         }
 
         // Initializing map
@@ -97,13 +105,24 @@ class CreatePost extends Component<IProps, IState>{
         });
 
         if (!error){
-            const {postContent, visibility} = this.state;
+            const {postContent, visibility, pictureFile} = this.state;
             const user: User = (store.getState() as IStore).userAuthenticated!;
             
-            const post: Post = new Post(user, new Date(), postContent, visibility);
+            const hasPicture: boolean = pictureFile !== undefined;
+
+            const post: Post = new Post(user, new Date(), postContent, visibility, hasPicture);
             PostDB.createPost(post).then((idPost) => {
+                if (hasPicture)
+                    CloudStorage.uploadPostImage(idPost, pictureFile!);
+
                 this.props.dispatch(Actions.createPost(post));
-                this.setState({submitted: false, showSnackBar: true, postContent: ''});
+                this.setState({
+                    submitted: false,
+                    showSnackBar: true,
+                    postContent: '',
+                    pictureFile: undefined,
+                    picturePreviewURL: ''
+                });
             });
         }
     }
@@ -112,8 +131,27 @@ class CreatePost extends Component<IProps, IState>{
     setVisibility = (newValue: PostVisibility) => this.setState({visibility: newValue});
     handleCloseSnackBar = () => this.setState({showSnackBar: false})
     
+    handleImageSelected = (file: File) => {
+        console.log('toma trouxa');
+        if (file){
+            let fileReader: FileReader = new FileReader();
+            fileReader.onloadend = () => {
+                this.setState({
+                    pictureFile: file,
+                    picturePreviewURL: fileReader.result! as string
+                });
+            }
+
+            fileReader.readAsDataURL(file);
+        }
+    }
+
+    handleCancelPicture = () => {
+        this.setState({pictureFile: undefined, picturePreviewURL: ''});
+    }
+
     render(){
-        const {visibility, postContent, showSnackBar, textFieldFocused} = this.state;
+        const {visibility, postContent, showSnackBar, textFieldFocused, picturePreviewURL} = this.state;
 
         this.setHelpersText();
         return(
@@ -143,27 +181,65 @@ class CreatePost extends Component<IProps, IState>{
                 </div>
     
                 <div className="bottomButtons">
-                    <FormControl 
-                        variant="outlined"
-                        className = 'formChooseVisibility'>
-                        <Select
-                            labelId="demo-simple-select-error-label"
-                            id="demo-simple-select-error"
-                            value={visibility}
-                            onChange={newValue => this.setVisibility(newValue.target.value as PostVisibility)}
-                            >
-                            <MenuItem value={PostVisibility.PRIVATE}>Only friends</MenuItem>
-                            <MenuItem value={PostVisibility.PUBLIC}>Public</MenuItem>
-                        </Select>
-                    </FormControl>
-    
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick = {this.handlePost}
-                        className = 'formSubmit'>
-                        Post
-                    </Button>
+
+                    <div className="postUploadPicture">
+
+                        <div className="postUploadButtons">
+                            <input
+                                accept="image/*" 
+                                className='inputUploadPicture'
+                                type="file"
+                                id='createPost-inputImage'
+                                onChange = {newValue => this.handleImageSelected(newValue.target.files![0])} />
+                            <label htmlFor="createPost-inputImage">
+                                <IconButton
+                                    color="primary"
+                                    aria-label="upload picture"
+                                    component="span">
+                                    <PhotoCamera />
+                                </IconButton>
+                            </label>
+
+                            {picturePreviewURL && 
+                                <IconButton 
+                                    aria-label="cancel upload picture"
+                                    onClick={this.handleCancelPicture}
+                                    component="span">
+                                    <BlockIcon />
+                                </IconButton>
+                            }
+
+                        </div>
+
+                        {picturePreviewURL && 
+                            <img className = 'postPicture' src={picturePreviewURL} />
+                        }
+
+                    </div>
+
+                    <div className="postButtonOptions">
+                        <FormControl 
+                            variant="outlined"
+                            className = 'formChooseVisibility'>
+                            <Select
+                                labelId="demo-simple-select-error-label"
+                                id="demo-simple-select-error"
+                                value={visibility}
+                                onChange={newValue => this.setVisibility(newValue.target.value as PostVisibility)}
+                                >
+                                <MenuItem value={PostVisibility.PRIVATE}>Only friends</MenuItem>
+                                <MenuItem value={PostVisibility.PUBLIC}>Public</MenuItem>
+                            </Select>
+                        </FormControl>
+        
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick = {this.handlePost}
+                            className = 'formSubmit'>
+                            Post
+                        </Button>
+                    </div>
                 </div>
             </div>
         );
